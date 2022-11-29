@@ -39,8 +39,7 @@ pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
         arg!(
             -e --extra <VALUE> "A space-separated string with the URIs of the peers that should always be in the configuration."
         )
-        .required(false)
-        .default_value("3"))
+        .required(false))
     .arg(
         arg!(
             -r --restart "Restart the Yggdrasil (systemd or windows) service"
