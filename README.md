@@ -16,7 +16,7 @@ In order for the utility to work fully and correctly, making changes to the Yggd
 
 It doesn't make sense to use the `-r` (restart Yggdrasil) and `-a` (use admin API) flags at the same time.
 
-## Usage Examples
+#### Usage Examples
 
 Output of a sorted list of peers:
 
@@ -44,7 +44,7 @@ sudo ./peers_updater -n 2 -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.uk:
 
 The utility can be run on a schedule using cron (Linux) or using another scheduler (Windows).
 
-## Build from source
+#### Build from source
 
 The project is being built without errors and warnings with cargo 1.65.0 and rustc 1.65.0.
 
