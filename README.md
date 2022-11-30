@@ -8,7 +8,19 @@ By setting up the automatic launch of the utility on a schedule, you can forget 
 
 **Attention!** When updating peers in the configuration file, all comments will be deleted from it. If you don't want to lose comments, use this utility only with the `-p` parameter, or make a backup copy of the file with comments before use.
 
-Use the `-h` parameter to familiarize yourself with the description of possible parameters.
+```
+Usage: peers_updater [OPTIONS]
+
+Options:
+  -p, --print           Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
+  -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
+  -a, --api             Add/remove peers during execution (requires enabling the admin API)
+  -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
+  -e, --extra <VALUE>   A space-separated string with the URIs of the peers that should always be in the configuration
+  -r, --restart         Restart the Yggdrasil (systemd or windows) service
+  -h, --help            Print help information
+  -V, --version         Print version information
+```
 
 To simply display a list of peers sorted by response time, use the `-p` parameter. At the same time, all other parameters will be ignored, no changes will be made to the configuration of Yggrasil.
 
