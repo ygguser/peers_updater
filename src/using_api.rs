@@ -1,6 +1,11 @@
 use crate::peer::Peer;
 
-pub fn add_remove_peers(peers: &Vec<Peer>, yggctl_path: &str, n_peers: u8) {
+pub fn add_remove_peers(
+    peers: &Vec<Peer>,
+    yggctl_path: &str,
+    n_peers: u8,
+    always_in_p: Option<&String>,
+) {
     // Removing old peers
     if let Ok(output) = std::process::Command::new(yggctl_path)
         .arg("getPeers")
@@ -42,6 +47,17 @@ pub fn add_remove_peers(peers: &Vec<Peer>, yggctl_path: &str, n_peers: u8) {
         n_added += 1;
         if n_added == n_peers {
             break;
+        }
+    }
+
+    //Always in
+    if let Some(always_in) = always_in_p {
+        let ai = always_in.split(" ");
+        for ai_s in ai {
+            let _ = std::process::Command::new(yggctl_path)
+                .arg("addpeer")
+                .arg(format!("uri={}", ai_s))
+                .output();
         }
     }
 }

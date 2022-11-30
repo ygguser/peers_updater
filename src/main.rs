@@ -2,7 +2,6 @@ use crate::latency::set_latency;
 use crate::parsing::collect_peers;
 use crate::peer::Peer;
 use crate::unpack::unpack_archive;
-//use clap::{arg, value_parser, Arg, ArgAction};
 use clap_args::build_args;
 use obj_hjson::add_peers_to_conf;
 use pathes::{get_def_cfg_path, get_yggctl_path};
@@ -113,6 +112,7 @@ fn main() {
     // Deleting unnecessary files
     let _ret = fs::remove_dir_all(std::path::Path::new(tmp_dir.as_path()));
 
+    // Calculating latency
     std::thread::scope(|scope| {
         for peer in &mut peers {
             scope.spawn(move || {
@@ -165,7 +165,12 @@ fn main() {
         // Adding peers during execution
         let use_api = matches.get_flag("api");
         if use_api {
-            using_api::add_remove_peers(&peers, yggctl_path, n_peers);
+            using_api::add_remove_peers(
+                &peers,
+                yggctl_path,
+                n_peers,
+                matches.get_one::<String>("extra"),
+            );
         }
     }
 }
