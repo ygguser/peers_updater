@@ -30,14 +30,14 @@ pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
     )
     .arg(
         arg!(
-            -n --number <VALUE> "The number of peers to add"
+            -n --number <VALUE> "The number of peers to add (excluding extra ones)"
         )
         .required(false)
         .default_value("3")        
     )
     .arg(
         arg!(
-            -e --extra <VALUE> "A space-separated string with the URIs of the peers that should always be in the configuration."
+            -e --extra <VALUE> "A space-separated string with the URIs of the peers that should always be in the configuration"
         )
         .required(false))
     .arg(
