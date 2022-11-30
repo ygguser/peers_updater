@@ -2,7 +2,7 @@
 
 The utility is designed to check the availability of peers and automatically update them in the Yggdrasil configuration file, as well as using the admin API - addPeer method.
 
-By setting up the automatic launch of the utility on a schedule, you can forget that public feasts sometimes stop working and you need to update them manually.
+By setting up the automatic launch of the utility on a schedule, you can forget that public peers sometimes stop working and you need to update them manually.
 
 **Attention!** When running the utility without specifying any command-line parameters, the default path to the configuration file will be used, and if the file on this path exists and there are permissions to change it, the peers in it will be updated.
 
