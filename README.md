@@ -1,4 +1,4 @@
-### Yggrasil network peers checker / upadater
+### Yggrasil network peers checker / updater
 
 The utility is designed to check the availability of peers and automatically update them in the Yggdrasil configuration file, as well as using the admin API - addPeer method.
 
