@@ -11,6 +11,7 @@ pub fn add_peers_to_conf(
     conf: &PathBuf,
     n_peers: u8,
     always_in_p: Option<&String>,
+    ignored_peers: Option<&String>,
     restart: bool,
     is_unix: bool,
 ) {
@@ -42,6 +43,11 @@ pub fn add_peers_to_conf(
 
     let mut n_added: u8 = 0;
     for peer in peers {
+        if let Some(ignored_peers_p) = ignored_peers {
+            if ignored_peers_p.contains(&peer.uri) {
+                continue;
+            }
+        }
         mp_array.push(Value::String(format!(
             "{}#{}/{}",
             peer.uri, peer.region, peer.country

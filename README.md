@@ -17,6 +17,7 @@ Options:
   -a, --api             Add/remove peers during execution (requires enabling the admin API)
   -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
   -e, --extra <VALUE>   A space-separated string with the URIs of the peers that should always be in the configuration
+  -i, --ignore <VALUE>  A space-separated string with the URIs of the peers that should always be ignored
   -r, --restart         Restart the Yggdrasil (systemd or windows) service
   -h, --help            Print help information
   -V, --version         Print version information

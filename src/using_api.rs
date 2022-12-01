@@ -5,6 +5,7 @@ pub fn add_remove_peers(
     yggctl_path: &str,
     n_peers: u8,
     always_in_p: Option<&String>,
+    ignored_peers: Option<&String>,
 ) {
     // Removing old peers
     if let Ok(output) = std::process::Command::new(yggctl_path)
@@ -40,6 +41,11 @@ pub fn add_remove_peers(
     // Adding new peers
     let mut n_added: u8 = 0;
     for peer in peers {
+        if let Some(ignored_peers_p) = ignored_peers {
+            if ignored_peers_p.contains(&peer.uri) {
+                continue;
+            }
+        }
         let _ = std::process::Command::new(yggctl_path)
             .arg("addpeer")
             .arg(format!("uri={}", peer.uri))

@@ -42,6 +42,11 @@ pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
         .required(false))
     .arg(
         arg!(
+            -i --ignore <VALUE> "A space-separated string with the URIs of the peers that should always be be ignored"
+        )
+        .required(false))
+    .arg(
+        arg!(
             -r --restart "Restart the Yggdrasil (systemd or windows) service"
         )
         .required(false)
