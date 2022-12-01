@@ -37,7 +37,7 @@ Output of a sorted list of peers:
 ./peers_updater -p
 ```
 
-Updating peers in the configuration file at the specified path (two peers will be entered):
+Updating peers in the configuration file at the specified path (two peers will be added):
 
 ```
 sudo ./peers_updater -c /home/user/tst/yggdrasil.conf -n 2
@@ -56,6 +56,8 @@ sudo ./peers_updater -n 2 -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.uk:
 ```
 
 The utility can be run on a schedule using cron (Linux) or using another scheduler (Windows).
+
+Updating the configuration file on a schedule probably makes sense no more than once a week. Because there is little chance that 2-3-4 peers specified in the configuration file will stop working at the same time during the week.
 
 #### Build from source
 
