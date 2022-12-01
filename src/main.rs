@@ -1,13 +1,7 @@
-use crate::latency::set_latency;
-use crate::parsing::collect_peers;
 use crate::peer::Peer;
-use crate::unpack::unpack_archive;
-use clap_args::build_args;
-use obj_hjson::add_peers_to_conf;
-use pathes::{get_def_cfg_path, get_yggctl_path};
 use std::fs;
 use std::fs::File;
-use std::io::{self};
+use std::io;
 use std::path::PathBuf;
 use std::process;
 use tempfile::Builder;
@@ -25,10 +19,10 @@ mod using_api;
 fn main() {
     let is_unix: bool = cfg!(unix);
 
-    let def_cfg_path: &str = get_def_cfg_path(is_unix);
-    let yggctl_path: &str = get_yggctl_path(is_unix);
+    let def_cfg_path: &str = pathes::get_def_cfg_path(is_unix);
+    let yggctl_path: &str = pathes::get_yggctl_path(is_unix);
 
-    let matches = build_args(def_cfg_path);
+    let matches = clap_args::build_args(def_cfg_path);
 
     let print_only = matches.get_flag("print");
 
@@ -76,7 +70,7 @@ fn main() {
     };
 
     // Unpacking the downloaded archive
-    let _res = match unpack_archive(&tmp_dir) {
+    let _res = match crate::unpack::unpack_archive(&tmp_dir) {
         Ok(val) => val,
         _ => {
             eprintln!("Failed to unpack archive.");
@@ -101,7 +95,7 @@ fn main() {
 
     // Collecting peers in a vector
     let mut peers: Vec<Peer> = Vec::new();
-    match collect_peers(&peers_dir, &mut peers) {
+    match crate::parsing::collect_peers(&peers_dir, &mut peers) {
         Ok(_r) => _r,
         _ => {
             eprintln!("Couldn't get peer addresses from downloaded files.");
@@ -116,7 +110,7 @@ fn main() {
     std::thread::scope(|scope| {
         for peer in &mut peers {
             scope.spawn(move || {
-                set_latency(peer);
+                crate::latency::set_latency(peer);
             });
         }
     });
@@ -152,12 +146,16 @@ fn main() {
             }
         };
 
+        let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
+        let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
+
         // Adding peers to the configuration file
-        add_peers_to_conf(
+        obj_hjson::add_peers_to_conf(
             &peers,
             conf,
             n_peers,
-            matches.get_one::<String>("extra"),
+            exrta_peers,
+            ignored_peers,
             matches.get_flag("restart"),
             is_unix,
         );
@@ -165,12 +163,7 @@ fn main() {
         // Adding peers during execution
         let use_api = matches.get_flag("api");
         if use_api {
-            using_api::add_remove_peers(
-                &peers,
-                yggctl_path,
-                n_peers,
-                matches.get_one::<String>("extra"),
-            );
+            using_api::add_remove_peers(&peers, yggctl_path, n_peers, exrta_peers, ignored_peers);
         }
     }
 }
