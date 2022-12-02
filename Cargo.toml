@@ -9,14 +9,19 @@ repository = "https://notabug.org/ygguser/peers_updater"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "4.0.26", features = ["derive"] }
+clap = { version = "4.0.26", default-features = false, features = [
+    "suggestions",
+    "usage",
+    "help",
+    "std",
+] }
 dns-lookup = "1.0.8"
 nu-json = "0.71.0"
-regex = "1.7.0"
+regex = { version = "1.7.0", default-features = false, features = ["std"] }
 reqwest = { version = "0.11.13", features = ["blocking"] }
 tempfile = "3.3.0"
 walkdir = "2.3.2"
-zip = "0.6.3"
+zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 openssl = { version = "0.10", features = ["vendored"] }
 
 [profile.release]
