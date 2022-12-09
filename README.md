@@ -4,8 +4,6 @@ The utility is designed to check the availability of peers and automatically upd
 
 By setting up the automatic launch of the utility on a schedule, you can forget that public peers sometimes stop working and you need to update them manually.
 
-**Attention!** When running the utility without specifying any command-line parameters, the default path to the configuration file will be used, and if the file on this path exists and there are permissions to change it, the peers in it will be updated.
-
 **Attention!** When updating peers in the configuration file, all comments will be deleted from it. If you don't want to lose comments, use this utility only with the `-p` parameter, or make a backup copy of the file with comments before use.
 
 ```
@@ -14,6 +12,7 @@ Usage: peers_updater [OPTIONS]
 Options:
   -p, --print           Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
   -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
+  -u, --update_cfg      Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
   -a, --api             Add/remove peers during execution (requires enabling the admin API)
   -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
   -e, --extra <VALUE>   A space-separated string with the URIs of the peers that should always be in the configuration
@@ -40,19 +39,19 @@ Output of a sorted list of peers:
 Updating peers in the configuration file at the specified path (two peers will be added):
 
 ```
-sudo ./peers_updater -c /home/user/tst/yggdrasil.conf -n 2
+sudo ./peers_updater -c /home/user/tst/yggdrasil.conf -n 2 -u
 ```
 
 Updating peers (2 peers will be added) in the configuration file with the default path to it, as well as adding peers using the admin API:
 
 ```
-sudo ./peers_updater -n 2 -a
+sudo ./peers_updater -n 2 -u -a
 ```
 
 Updating peers (2 peers will be added) in the configuration file with the default path to it, and adding additional peers (in a space-separated line). A total of 4 peers will be added:
 
 ```
-sudo ./peers_updater -n 2 -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.uk:7777"
+sudo ./peers_updater -n 2 -u -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.uk:7777"
 ```
 
 The utility can be run on a schedule using cron (Linux) or using another scheduler (Windows).

@@ -24,6 +24,12 @@ pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
        .value_parser(value_parser!(PathBuf)))
     .arg(
         arg!(
+            -u --update_cfg "Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file."
+        )
+        .required(false)
+    )
+    .arg(
+        arg!(
             -a --api "Add/remove peers during execution (requires enabling the admin API)"
         )
         .required(false)

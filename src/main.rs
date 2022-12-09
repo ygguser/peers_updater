@@ -27,6 +27,15 @@ fn main() {
     let matches = clap_args::build_args(def_cfg_path);
 
     let print_only = matches.get_flag("print");
+    let update_cfg = matches.get_flag("update_cfg");
+    let use_api = matches.get_flag("api");
+
+    if !(print_only || update_cfg || use_api) {
+        println!("Parameters expected: '-p' or '-u' and (or) '-a'.");
+        println!("For more information try '-h'.");
+        println!("Nothing to do, exit.");
+        process::exit(0);
+    }
 
     let conf_path = match matches.get_one::<PathBuf>("config") {
         Some(_c) => _c,
@@ -140,57 +149,57 @@ fn main() {
             );
         }
         process::exit(0);
-    }
+    } else if update_cfg || use_api {
+        if let Some(number) = matches.get_one::<String>("number") {
+            let n_peers: u8 = match number.parse() {
+                Ok(_n) => _n,
+                Err(e) => {
+                    eprintln!(
+                        "The number of peers must be in the range from 0 to 255 ({}).",
+                        e
+                    );
+                    process::exit(1);
+                }
+            };
 
-    if let Some(number) = matches.get_one::<String>("number") {
-        let n_peers: u8 = match number.parse() {
-            Ok(_n) => _n,
-            Err(e) => {
-                eprintln!(
-                    "The number of peers must be in the range from 0 to 255 ({}).",
-                    e
+            //Parsing the configuration file
+            let mut conf_obj: Map<String, nu_json::Value> =
+                match parse_config::get_hjson_obj(conf_path) {
+                    Ok(co) => co,
+                    Err(e) => {
+                        eprintln!("Can't parse the config file ({})!", e);
+                        process::exit(1);
+                    }
+                };
+
+            let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
+            let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
+
+            // Adding peers to the configuration file
+            if update_cfg {
+                cfg_file_modify::add_peers_to_conf(
+                    &peers,
+                    &mut conf_obj,
+                    conf_path,
+                    n_peers,
+                    exrta_peers,
+                    ignored_peers,
+                    matches.get_flag("restart"),
+                    is_unix,
                 );
-                process::exit(1);
             }
-        };
 
-        let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
-        let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
-
-        //Parsing the configuration file
-        let mut conf_obj: Map<String, nu_json::Value> = match parse_config::get_hjson_obj(conf_path)
-        {
-            Ok(co) => co,
-            Err(e) => {
-                eprintln!("Can't parse the config file ({})!", e);
-                process::exit(1);
+            // Adding peers during execution
+            if use_api {
+                using_api::update_peers(
+                    &peers,
+                    &mut conf_obj,
+                    n_peers,
+                    exrta_peers,
+                    ignored_peers,
+                    is_unix,
+                );
             }
-        };
-
-        // Adding peers to the configuration file
-        cfg_file_modify::add_peers_to_conf(
-            &peers,
-            &mut conf_obj,
-            conf_path,
-            n_peers,
-            exrta_peers,
-            ignored_peers,
-            matches.get_flag("restart"),
-            is_unix,
-        );
-
-        // Adding peers during execution
-        let use_api = matches.get_flag("api");
-        if use_api {
-            //using_api::add_remove_peers(&peers, yggctl_path, n_peers, exrta_peers, ignored_peers);
-            using_api::update_peers(
-                &peers,
-                &mut conf_obj,
-                n_peers,
-                exrta_peers,
-                ignored_peers,
-                is_unix,
-            );
         }
     }
 }
