@@ -6,27 +6,29 @@ use std::path::PathBuf;
 use std::process;
 use tempfile::Builder;
 
+use nu_json::Map;
+
+mod cfg_file_modify;
 mod clap_args;
-mod config;
+mod defaults;
 mod latency;
-mod obj_hjson;
-mod parsing;
-mod pathes;
+mod parse_config;
+mod parsing_peers;
 mod peer;
+mod resolve;
 mod unpack;
 mod using_api;
 
 fn main() {
     let is_unix: bool = cfg!(unix);
 
-    let def_cfg_path: &str = pathes::get_def_cfg_path(is_unix);
-    let yggctl_path: &str = pathes::get_yggctl_path(is_unix);
+    let def_cfg_path: &str = defaults::get_def_cfg_path(is_unix);
 
     let matches = clap_args::build_args(def_cfg_path);
 
     let print_only = matches.get_flag("print");
 
-    let conf = match matches.get_one::<PathBuf>("config") {
+    let conf_path = match matches.get_one::<PathBuf>("config") {
         Some(_c) => _c,
         _ => {
             eprintln!("Can't get the configuration file default path.");
@@ -36,16 +38,19 @@ fn main() {
 
     if !print_only {
         // Checking if the file exists
-        if !conf.exists() {
+        if !conf_path.exists() {
             eprintln!("The Yggdrasil configuration file does not exist.");
             process::exit(1);
         }
 
         // Checking write access to the configuration file
-        let _t = match check_permissions(&conf) {
+        let _t = match check_permissions(&conf_path) {
             Ok(_ro) => _ro,
-            _ => {
-                eprintln!("There is no write access to the Yggdrasil configuration file.");
+            Err(e) => {
+                eprintln!(
+                    "There is no write access to the Yggdrasil configuration file ({}).",
+                    e
+                );
                 process::exit(1);
             }
         };
@@ -54,8 +59,8 @@ fn main() {
     // Creating a temporary directory
     let tmp_dir = match create_tmp_dir() {
         Ok(val) => val,
-        _ => {
-            eprintln!("Failed to create a temporary directory.");
+        Err(e) => {
+            eprintln!("Failed to create a temporary directory ({}).", e);
             process::exit(1);
         }
     };
@@ -63,8 +68,8 @@ fn main() {
     // Download the archive with peers
     let _res = match download_archive(&tmp_dir) {
         Ok(val) => val,
-        _ => {
-            eprintln!("Failed to download archive with peers.");
+        Err(e) => {
+            eprintln!("Failed to download archive with peers ({}).", e);
             process::exit(1);
         }
     };
@@ -72,8 +77,8 @@ fn main() {
     // Unpacking the downloaded archive
     let _res = match crate::unpack::unpack_archive(&tmp_dir) {
         Ok(val) => val,
-        _ => {
-            eprintln!("Failed to unpack archive.");
+        Err(e) => {
+            eprintln!("Failed to unpack archive ({}).", e);
             process::exit(1);
         }
     };
@@ -95,10 +100,10 @@ fn main() {
 
     // Collecting peers in a vector
     let mut peers: Vec<Peer> = Vec::new();
-    match crate::parsing::collect_peers(&peers_dir, &mut peers) {
+    match crate::parsing_peers::collect_peers(&peers_dir, &mut peers) {
         Ok(_r) => _r,
-        _ => {
-            eprintln!("Couldn't get peer addresses from downloaded files.");
+        Err(e) => {
+            eprintln!("Couldn't get peer addresses from downloaded files ({}).", e);
             process::exit(1);
         }
     };
@@ -140,8 +145,11 @@ fn main() {
     if let Some(number) = matches.get_one::<String>("number") {
         let n_peers: u8 = match number.parse() {
             Ok(_n) => _n,
-            _ => {
-                eprintln!("The number of peers must be in the range from 0 to 255.");
+            Err(e) => {
+                eprintln!(
+                    "The number of peers must be in the range from 0 to 255 ({}).",
+                    e
+                );
                 process::exit(1);
             }
         };
@@ -149,10 +157,21 @@ fn main() {
         let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
         let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
 
+        //Parsing the configuration file
+        let mut conf_obj: Map<String, nu_json::Value> = match parse_config::get_hjson_obj(conf_path)
+        {
+            Ok(co) => co,
+            Err(e) => {
+                eprintln!("Can't parse the config file ({})!", e);
+                process::exit(1);
+            }
+        };
+
         // Adding peers to the configuration file
-        obj_hjson::add_peers_to_conf(
+        cfg_file_modify::add_peers_to_conf(
             &peers,
-            conf,
+            &mut conf_obj,
+            conf_path,
             n_peers,
             exrta_peers,
             ignored_peers,
@@ -163,7 +182,15 @@ fn main() {
         // Adding peers during execution
         let use_api = matches.get_flag("api");
         if use_api {
-            using_api::add_remove_peers(&peers, yggctl_path, n_peers, exrta_peers, ignored_peers);
+            //using_api::add_remove_peers(&peers, yggctl_path, n_peers, exrta_peers, ignored_peers);
+            using_api::update_peers(
+                &peers,
+                &mut conf_obj,
+                n_peers,
+                exrta_peers,
+                ignored_peers,
+                is_unix,
+            );
         }
     }
 }

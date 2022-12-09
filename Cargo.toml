@@ -23,6 +23,7 @@ tempfile = "3.3.0"
 walkdir = "2.3.2"
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 openssl = { version = "0.10", features = ["vendored"] }
+uriparse = "0.6.4"
 
 [profile.release]
 strip = true
