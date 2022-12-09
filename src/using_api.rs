@@ -2,17 +2,20 @@ use crate::defaults;
 use crate::peer::Peer;
 use nu_json::Map;
 use std::net::{SocketAddr, TcpStream};
+#[cfg(not(target_os = "windows"))]
 use std::os::unix::net::UnixStream;
 use std::time;
 
 enum SockAddr {
     Tcp(SocketAddr),
+    #[cfg(not(target_os = "windows"))]
     Unix(String),
     None,
 }
 
 enum Connection {
     Tcp(TcpStream),
+    #[cfg(not(target_os = "windows"))]
     Unix(UnixStream),
     None,
 }
@@ -105,6 +108,7 @@ fn request(req: &str, socket_addr: &SockAddr, resp: &mut String) {
                 }
             };
         }
+        #[cfg(not(target_os = "windows"))]
         Connection::Unix(conn) => {
             let mut mut_conn = conn;
             let _ = match socket_io(&mut mut_conn, req, resp) {
@@ -207,6 +211,7 @@ fn get_connection(sock_addr: &SockAddr) -> Connection {
                 }
             };
         }
+        #[cfg(not(target_os = "windows"))]
         SockAddr::Unix(_sa) => {
             let _ = match UnixStream::connect(_sa) {
                 Ok(_s) => {
@@ -237,12 +242,18 @@ fn get_socket_addr(is_unix: bool, conf_obj: &mut Map<String, nu_json::Value>) ->
 
     if string_addr.contains("unix://") {
         //unix domain socket
+        #[cfg(not(target_os = "windows"))]
         return SockAddr::Unix(
             string_addr
                 .replace("\"", "")
                 .replace("unix://", "")
                 .to_string(),
         );
+        #[allow(unreachable_code)]
+        {
+            eprintln!("It is not possible to use a unix socket in Windows.");
+            return SockAddr::None;
+        }
     } else {
         //tcp
         let uri = match uriparse::URI::try_from(string_addr.as_str()) {
