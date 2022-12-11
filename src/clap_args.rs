@@ -1,9 +1,9 @@
 use clap::{arg, value_parser, Arg, ArgAction};
 use std::path::PathBuf;
 
-pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
+pub fn build_args() -> clap::ArgMatches {
     clap::Command::new("Yggdrasil peers updater")
-    .version("0.0.3")
+    .version(crate::version::APP_VERSION)
     .author("YggUser (https://matrix.to/#/@ygguser:matrix.org)")
     .about("The Yggdrasil peers updater automatically updates the peers in the Yggdrasil configuration file and/or calls addPeer/removePeer from the Yggdrasil Admin API.{n}Source code: https://github.com/ygguser/peers_updater")
     .arg(
@@ -17,7 +17,7 @@ pub fn build_args(def_cfg_path: &'static str) -> clap::ArgMatches {
         Arg::new("config")
        .short('c')
        .long("config")
-       .default_value(def_cfg_path)
+       .default_value(crate::defaults::DEF_CFG_PATH)
        .value_name("FILE")
        .help("The path to the Yggdrasil configuration file")
        .required(false)

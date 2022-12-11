@@ -1,15 +1,9 @@
-pub fn get_def_cfg_path(is_unix: bool) -> &'static str {
-    if is_unix {
-        "/etc/yggdrasil.conf"
-    } else {
-        r"C:\ProgramData\Yggdrasil\yggdrasil.conf"
-    }
-}
+#[cfg(target_os = "windows")]
+pub const DEF_CFG_PATH: &'static str = r"C:\ProgramData\Yggdrasil\yggdrasil.conf";
+#[cfg(not(target_os = "windows"))]
+pub const DEF_CFG_PATH: &'static str = "/etc/yggdrasil.conf";
 
-pub fn get_def_socket_addr(is_unix: bool) -> &'static str {
-    if is_unix {
-        "/var/run/yggdrasil.sock"
-    } else {
-        "localhost:9001"
-    }
-}
+#[cfg(target_os = "windows")]
+pub const DEF_SOCKET_ADDR: &'static str = "localhost:9001";
+#[cfg(not(target_os = "windows"))]
+pub const DEF_SOCKET_ADDR: &'static str = "/var/run/yggdrasil.sock";

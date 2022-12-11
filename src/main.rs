@@ -1,12 +1,11 @@
 use crate::peer::Peer;
+use nu_json::Map;
 use std::fs;
 use std::fs::File;
 use std::io;
 use std::path::PathBuf;
 use std::process;
 use tempfile::Builder;
-
-use nu_json::Map;
 
 mod cfg_file_modify;
 mod clap_args;
@@ -18,13 +17,10 @@ mod peer;
 mod resolve;
 mod unpack;
 mod using_api;
+mod version;
 
 fn main() {
-    let is_unix: bool = cfg!(unix);
-
-    let def_cfg_path: &str = defaults::get_def_cfg_path(is_unix);
-
-    let matches = clap_args::build_args(def_cfg_path);
+    let matches = clap_args::build_args();
 
     let print_only = matches.get_flag("print");
     let update_cfg = matches.get_flag("update_cfg");
@@ -185,20 +181,12 @@ fn main() {
                     exrta_peers,
                     ignored_peers,
                     matches.get_flag("restart"),
-                    is_unix,
                 );
             }
 
             // Adding peers during execution
             if use_api {
-                using_api::update_peers(
-                    &peers,
-                    &mut conf_obj,
-                    n_peers,
-                    exrta_peers,
-                    ignored_peers,
-                    is_unix,
-                );
+                using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers, ignored_peers);
             }
         }
     }

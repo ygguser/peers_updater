@@ -1,4 +1,3 @@
-use crate::defaults;
 use crate::peer::Peer;
 use nu_json::Map;
 use std::net::{SocketAddr, TcpStream};
@@ -26,9 +25,8 @@ pub fn update_peers(
     n_peers: u8,
     always_in_p: Option<&String>,
     ignored_peers: Option<&String>,
-    is_unix: bool,
 ) {
-    let socket_addr = get_socket_addr(is_unix, conf_obj);
+    let socket_addr = get_socket_addr(conf_obj);
 
     let mut response = String::new();
 
@@ -229,7 +227,7 @@ fn get_connection(sock_addr: &SockAddr) -> Connection {
     };
 }
 
-fn get_socket_addr(is_unix: bool, conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
+fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     //Extract value from conf_obj
     let mut _t_sa: String;
     let mut string_addr = if let Some(_string_addr) = conf_obj.get("AdminListen") {
@@ -237,7 +235,7 @@ fn get_socket_addr(is_unix: bool, conf_obj: &mut Map<String, nu_json::Value>) ->
 
         _t_sa
     } else {
-        String::from(defaults::get_def_socket_addr(is_unix))
+        String::from(crate::defaults::DEF_SOCKET_ADDR)
     };
 
     if string_addr.contains("unix://") {

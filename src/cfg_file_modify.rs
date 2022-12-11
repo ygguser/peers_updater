@@ -13,7 +13,6 @@ pub fn add_peers_to_conf(
     always_in_p: Option<&String>,
     ignored_peers: Option<&String>,
     restart: bool,
-    is_unix: bool,
 ) {
     // Extract the array of peers
     let peers_val = match conf_obj.get_mut("Peers") {
@@ -73,12 +72,14 @@ pub fn add_peers_to_conf(
 
         //Restart if required
         if restart {
-            if is_unix {
-                let _ = std::process::Command::new("systemctl")
-                    .arg("restart")
-                    .arg("yggdrasil")
-                    .spawn();
-            } else {
+            #[cfg(not(target_os = "windows"))]
+            let _ = std::process::Command::new("systemctl")
+                .arg("restart")
+                .arg("yggdrasil")
+                .spawn();
+
+            #[cfg(target_os = "windows")]
+            {
                 let _ = std::process::Command::new("net")
                     .arg("stop")
                     .arg("yggdrasil")
