@@ -180,8 +180,28 @@ fn main() {
                     n_peers,
                     exrta_peers,
                     ignored_peers,
-                    matches.get_flag("restart"),
                 );
+            }
+
+            //Restart if required
+            if matches.get_flag("restart") {
+                #[cfg(not(target_os = "windows"))]
+                let _ = std::process::Command::new("systemctl")
+                    .arg("restart")
+                    .arg("yggdrasil")
+                    .spawn();
+
+                #[cfg(target_os = "windows")]
+                {
+                    let _ = std::process::Command::new("net")
+                        .arg("stop")
+                        .arg("yggdrasil")
+                        .output();
+                    let _ = std::process::Command::new("net")
+                        .arg("start")
+                        .arg("yggdrasil")
+                        .spawn();
+                }
             }
 
             // Adding peers during execution

@@ -12,7 +12,6 @@ pub fn add_peers_to_conf(
     n_peers: u8,
     always_in_p: Option<&String>,
     ignored_peers: Option<&String>,
-    restart: bool,
 ) {
     // Extract the array of peers
     let peers_val = match conf_obj.get_mut("Peers") {
@@ -85,25 +84,4 @@ pub fn add_peers_to_conf(
             process::exit(1);
         }
     };
-
-    //Restart if required
-    if restart {
-        #[cfg(not(target_os = "windows"))]
-        let _ = std::process::Command::new("systemctl")
-            .arg("restart")
-            .arg("yggdrasil")
-            .spawn();
-
-        #[cfg(target_os = "windows")]
-        {
-            let _ = std::process::Command::new("net")
-                .arg("stop")
-                .arg("yggdrasil")
-                .output();
-            let _ = std::process::Command::new("net")
-                .arg("start")
-                .arg("yggdrasil")
-                .spawn();
-        }
-    }
 }
