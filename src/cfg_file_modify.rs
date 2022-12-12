@@ -57,38 +57,53 @@ pub fn add_peers_to_conf(
         }
     }
 
-    if let Ok(cfg_txt) = nu_json::to_string(&conf_obj) {
-        //Write to file
-        if let Ok(mut f) = File::create(&conf_path) {
-            if let Ok(_res) = f.write_all(cfg_txt.as_bytes()) {
-            } else {
-                eprintln!("The changes could not be written to the configuration file.");
-                process::exit(1);
-            }
-        } else {
-            eprintln!("The changes could not be written to the configuration file.");
+    //Convert json obj to string
+    let cfg_txt = match nu_json::to_string(&conf_obj) {
+        Ok(_ct) => _ct,
+        Err(e) => {
+            eprintln!("Failed to convert json object to string ({}).", e);
             process::exit(1);
         }
+    };
 
-        //Restart if required
-        if restart {
-            #[cfg(not(target_os = "windows"))]
-            let _ = std::process::Command::new("systemctl")
-                .arg("restart")
+    //Write to file
+    let mut f = match File::create(&conf_path) {
+        Ok(_f) => _f,
+        Err(e) => {
+            eprintln!("Failed to make changes to the file ({}).", e);
+            process::exit(1);
+        }
+    };
+
+    let _ = match f.write_all(cfg_txt.as_bytes()) {
+        Ok(_) => {}
+        Err(e) => {
+            eprintln!(
+                "The changes could not be written to the configuration file ({}).",
+                e
+            );
+            process::exit(1);
+        }
+    };
+
+    //Restart if required
+    if restart {
+        #[cfg(not(target_os = "windows"))]
+        let _ = std::process::Command::new("systemctl")
+            .arg("restart")
+            .arg("yggdrasil")
+            .spawn();
+
+        #[cfg(target_os = "windows")]
+        {
+            let _ = std::process::Command::new("net")
+                .arg("stop")
+                .arg("yggdrasil")
+                .output();
+            let _ = std::process::Command::new("net")
+                .arg("start")
                 .arg("yggdrasil")
                 .spawn();
-
-            #[cfg(target_os = "windows")]
-            {
-                let _ = std::process::Command::new("net")
-                    .arg("stop")
-                    .arg("yggdrasil")
-                    .output();
-                let _ = std::process::Command::new("net")
-                    .arg("start")
-                    .arg("yggdrasil")
-                    .spawn();
-            }
         }
     }
 }
