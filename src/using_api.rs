@@ -230,7 +230,7 @@ fn get_connection(sock_addr: &SockAddr) -> Connection {
 fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     //Extract value from conf_obj
     let mut _t_sa: String;
-    let mut string_addr = if let Some(_string_addr) = conf_obj.get("AdminListen") {
+    let string_addr = if let Some(_string_addr) = conf_obj.get("AdminListen") {
         _t_sa = format!("{}", _string_addr).replace("\"", "");
 
         _t_sa
@@ -254,6 +254,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
         }
     } else {
         //tcp
+        let mut string_addr = string_addr.replace("tcp://", "").replace("\"", "");
         let uri = match uriparse::URI::try_from(string_addr.as_str()) {
             Ok(_u) => _u,
             Err(e) => {
