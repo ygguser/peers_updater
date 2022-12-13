@@ -158,28 +158,27 @@ fn main() {
                 }
             };
 
-            //Parsing the configuration file
-            let mut conf_obj: Map<String, nu_json::Value> =
-                match parse_config::get_hjson_obj(conf_path) {
-                    Ok(co) => co,
-                    Err(e) => {
-                        eprintln!("Can't parse the config file ({})!", e);
-                        process::exit(1);
-                    }
-                };
+            //Reading the configuration file
+            let cfg_txt = match parse_config::read_config(conf_path) {
+                Ok(_ct) => _ct,
+                Err(e) => {
+                    eprintln!("The configuration file cannot be read ({}).", e);
+                    process::exit(1);
+                }
+            };
 
             let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
             let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
 
             // Adding peers to the configuration file
             if update_cfg {
-                cfg_file_modify::add_peers_to_conf(
+                cfg_file_modify::add_peers_to_conf_new(
                     &peers,
-                    &mut conf_obj,
                     conf_path,
                     n_peers,
                     exrta_peers,
                     ignored_peers,
+                    &cfg_txt,
                 );
             }
 
@@ -206,6 +205,16 @@ fn main() {
 
             // Adding peers during execution
             if use_api {
+                //Parsing the configuration file
+                let mut conf_obj: Map<String, nu_json::Value> =
+                    match parse_config::get_hjson_obj(&cfg_txt) {
+                        Ok(co) => co,
+                        Err(e) => {
+                            eprintln!("Can't parse the config file ({})!", e);
+                            process::exit(1);
+                        }
+                    };
+
                 using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers, ignored_peers);
             }
         }

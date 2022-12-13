@@ -4,7 +4,7 @@ use std::io;
 use std::io::prelude::*;
 use std::path::PathBuf;
 
-fn read_config(path: &PathBuf) -> io::Result<String> {
+pub fn read_config(path: &PathBuf) -> io::Result<String> {
     let mut f = File::open(path)?;
     let mut buffer = String::new();
     f.read_to_string(&mut buffer)?;
@@ -13,8 +13,6 @@ fn read_config(path: &PathBuf) -> io::Result<String> {
     //Ok(format!("{}", buffer))
 }
 
-pub fn get_hjson_obj(path: &PathBuf) -> nu_json::Result<Map<String, Value>> {
-    let txt = read_config(path)?;
-
-    return nu_json::from_str(&txt);
+pub fn get_hjson_obj(cfg_txt: &str) -> nu_json::Result<Map<String, Value>> {
+    return nu_json::from_str(&cfg_txt);
 }
