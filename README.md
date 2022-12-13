@@ -4,8 +4,6 @@ The utility is designed to check the availability of peers and automatically upd
 
 By setting up the automatic launch of the utility on a schedule, you can forget that public peers sometimes stop working and you need to update them manually.
 
-**Attention!** When updating peers in the configuration file, all comments will be deleted from it. If you don't want to lose comments, use this utility without the `-u` parameter, or make a backup copy of the file with comments before use.
-
 ```
 Usage: peers_updater [OPTIONS]
 
