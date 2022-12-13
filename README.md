@@ -56,7 +56,21 @@ sudo ./peers_updater -n 2 -u -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.
 
 The utility can be run on a schedule using cron (Linux) or using another scheduler (Windows).
 
+##### Example with scheduled launch
 Updating the configuration file on a schedule probably makes sense no more than once a week. Because there is little chance that 2-3-4 peers specified in the configuration file will stop working at the same time during the week.
+
+Launching the editor:
+```
+sudo crontab -e
+```
+
+At the end of the file, add: 
+```
+0 0 * * 0 /path/peers_updater -u -n 3 -r -c /etc/yggdrasil.conf >/dev/null 2>&1
+```
+Save the changes.
+
+Now the peer nodes will be updated on Sundays at 0 o'clock.
 
 #### Build from source
 
