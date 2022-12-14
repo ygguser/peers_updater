@@ -15,7 +15,10 @@ pub fn resolve(name: &String) -> Option<String> {
     };
 
     match ips.first() {
-        Some(_ip) => Some(_ip.to_string()),
+        Some(_ip) =>
+            if      _ip.is_ipv6() { Some(format!("[{}]", _ip.to_string())) }
+            else if _ip.is_ipv4() { Some(format!("{}"  , _ip.to_string())) }
+            else                  { None                                   },
         _ => None,
     }
 }
