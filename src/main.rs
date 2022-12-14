@@ -41,7 +41,7 @@ fn main() {
         }
     };
 
-    if !print_only {
+    if update_cfg {
         // Checking if the file exists
         if !conf_path.exists() {
             eprintln!("The Yggdrasil configuration file does not exist.");
