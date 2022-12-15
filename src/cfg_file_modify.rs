@@ -5,11 +5,10 @@ use std::path::PathBuf;
 
 pub fn add_peers_to_conf_new(
     peers: &Vec<Peer>,
-
     conf_path: &PathBuf,
     n_peers: u8,
     always_in_p: Option<&String>,
-    ignored_peers: Option<&String>,
+
     cfg_txt: &str,
 ) {
     let mut char_vec: Vec<char> = cfg_txt.chars().collect();
@@ -27,11 +26,6 @@ pub fn add_peers_to_conf_new(
 
     let mut n_added: u8 = 0;
     for peer in peers {
-        if let Some(ignored_peers_p) = ignored_peers {
-            if ignored_peers_p.contains(&peer.uri) {
-                continue;
-            }
-        }
         new_peers.push_str(
             format!("\n    #{}/{}\n    {}", peer.region, peer.country, peer.uri).as_str(),
         );

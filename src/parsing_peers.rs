@@ -7,7 +7,7 @@ use std::path::PathBuf;
 use std::process;
 use walkdir::WalkDir;
 
-pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>) -> io::Result<bool> {
+pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> io::Result<bool> {
     let re = match Regex::new(r"(tcp|tls)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
         Ok(_r) => _r,
         Err(e) => {
@@ -43,10 +43,25 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>) -> io::Result<bool> {
                 for line in lines {
                     if let Ok(str) = line {
                         for peer_ in re.captures_iter(str.as_str()) {
+                            let ignored = ignored_peers.split(" ");
+                            let uri = match peer_.get(0) {
+                                Some(_u) => _u.as_str().to_string(),
+                                None => {
+                                    continue;
+                                }
+                            };
+                            let mut skip = false;
+                            for ig in ignored {
+                                if uri.contains(ig) {
+                                    skip = true;
+                                    break;
+                                }
+                            }
+                            if skip {
+                                continue;
+                            }
                             v.push(Peer::new(
-                                peer_
-                                    .get(0)
-                                    .map_or("".to_string(), |m| m.as_str().to_string()),
+                                uri,
                                 peer_
                                     .get(2)
                                     .map_or("".to_string(), |m| m.as_str().to_string()),

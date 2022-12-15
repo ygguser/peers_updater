@@ -102,9 +102,13 @@ fn main() {
         std::path::Path::new(format!("{}/public-peers-master/", &tmp_dir.display()).as_str())
             .to_path_buf();
 
+    let ignored_peers: &str = match matches.get_one::<String>("ignore") {
+        Some(_i_p) => _i_p.as_str(),
+        None => "",
+    };
     // Collecting peers in a vector
     let mut peers: Vec<Peer> = Vec::new();
-    match crate::parsing_peers::collect_peers(&peers_dir, &mut peers) {
+    match crate::parsing_peers::collect_peers(&peers_dir, &mut peers, ignored_peers) {
         Ok(_r) => _r,
         Err(e) => {
             eprintln!("Couldn't get peer addresses from downloaded files ({}).", e);
@@ -167,7 +171,6 @@ fn main() {
             };
 
             let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
-            let ignored_peers: Option<&String> = matches.get_one::<String>("ignore");
 
             // Adding peers to the configuration file
             if update_cfg {
@@ -176,7 +179,6 @@ fn main() {
                     conf_path,
                     n_peers,
                     exrta_peers,
-                    ignored_peers,
                     &cfg_txt,
                 );
             }
@@ -214,7 +216,7 @@ fn main() {
                         }
                     };
 
-                using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers, ignored_peers);
+                using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers);
             }
         }
     }

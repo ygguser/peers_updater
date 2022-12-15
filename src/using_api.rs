@@ -24,7 +24,6 @@ pub fn update_peers(
     conf_obj: &mut Map<String, nu_json::Value>,
     n_peers: u8,
     always_in_p: Option<&String>,
-    ignored_peers: Option<&String>,
 ) {
     let socket_addr = get_socket_addr(conf_obj);
 
@@ -43,11 +42,6 @@ pub fn update_peers(
     // Adding new peers
     let mut n_added: u8 = 0;
     for peer in peers {
-        if let Some(ignored_peers_p) = ignored_peers {
-            if ignored_peers_p.contains(&peer.uri) {
-                continue;
-            }
-        }
         response.clear();
         request(
             format!(
