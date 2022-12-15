@@ -52,6 +52,12 @@ Updating peers (2 peers will be added) in the configuration file with the defaul
 sudo ./peers_updater -n 2 -u -a -e "tcp://my.favorite.peer.uk:7777 tls://i.love.uk:7777"
 ```
 
+Updating peers (1 peer will be added). At the same time the peers will be ignored, in the URL of which there are: "tls:/ badpeer unstable.peer.far.away.from.me certain.port.peer.co:6767 377337":
+
+```
+sudo ./peers_updater -n 1 -u -i "tls:/ badpeer unstable.peer.far.away.from.me certain.port.peer.co:6767 7337"
+```
+
 The utility can be run on a schedule using cron (Linux) or using another scheduler (Windows).
 
 ##### Example with scheduled launch
