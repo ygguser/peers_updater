@@ -1,10 +1,10 @@
 [package]
 name = "peers_updater"
-version = "0.0.5"
+version = "0.0.6"
 edition = "2021"
 authors = ["YggUser (https://matrix.to/#/@ygguser:matrix.org)"]
 readme = "README.md"
-repository = "https://notabug.org/ygguser/peers_updater"
+repository = "https://github.com/ygguser/peers_updater"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

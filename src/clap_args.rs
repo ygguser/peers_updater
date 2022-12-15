@@ -3,7 +3,7 @@ use std::path::PathBuf;
 
 pub fn build_args() -> clap::ArgMatches {
     clap::Command::new("Yggdrasil peers updater")
-    .version(crate::version::APP_VERSION)
+    .version(env!("CARGO_PKG_VERSION"))
     .author("YggUser (https://matrix.to/#/@ygguser:matrix.org)")
     .about("The Yggdrasil peers updater automatically updates the peers in the Yggdrasil configuration file and/or calls addPeer/removePeer from the Yggdrasil Admin API.{n}Source code: https://github.com/ygguser/peers_updater")
     .arg(

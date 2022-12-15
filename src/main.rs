@@ -17,7 +17,6 @@ mod peer;
 mod resolve;
 mod unpack;
 mod using_api;
-mod version;
 
 fn main() {
     let matches = clap_args::build_args();
