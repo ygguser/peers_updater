@@ -48,7 +48,7 @@ pub fn build_args() -> clap::ArgMatches {
         .required(false))
     .arg(
         arg!(
-            -i --ignore <VALUE> "A space-separated string with the URIs of the peers that should always be be ignored"
+            -i --ignore <VALUE> "A space-separated string of characters. Peers whose URIs contain combinations of this characters will not be added to the configuration"
         )
         .required(false))
     .arg(
