@@ -16,6 +16,8 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
         }
     };
 
+    let mut ignored = ignored_peers.split(" ");
+
     for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
         if file.metadata().unwrap().is_file() {
             //println!("{}", file.path().display());
@@ -43,7 +45,6 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
                 for line in lines {
                     if let Ok(str) = line {
                         for peer_ in re.captures_iter(str.as_str()) {
-                            let ignored = ignored_peers.split(" ");
                             let uri = match peer_.get(0) {
                                 Some(_u) => _u.as_str().to_string(),
                                 None => {
@@ -51,8 +52,8 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
                                 }
                             };
                             let mut skip = false;
-                            for ig in ignored {
-                                if uri.contains(ig) {
+                            for ig in &mut ignored {
+                                if (!ig.is_empty()) && uri.contains(ig) {
                                     skip = true;
                                     break;
                                 }
