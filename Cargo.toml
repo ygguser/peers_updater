@@ -1,6 +1,6 @@
 [package]
 name = "peers_updater"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2021"
 authors = ["YggUser (https://matrix.to/#/@ygguser:matrix.org)"]
 readme = "README.md"
@@ -18,12 +18,20 @@ clap = { version = "4.0.26", default-features = false, features = [
 dns-lookup = "1.0.8"
 nu-json = "0.71.0"
 regex = { version = "1.7.0", default-features = false, features = ["std"] }
-reqwest = { version = "0.11.13", features = ["blocking"] }
 tempfile = "3.3.0"
 walkdir = "2.3.2"
-zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
-openssl = { version = "0.10", features = ["vendored"] }
 uriparse = "0.6.4"
+zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
+
+[target.'cfg(unix)'.dependencies]
+reqwest = { version = "0.11.13", default-features = false, features = [
+    "rustls-tls-native-roots",
+    "blocking",
+] }
+
+[target.'cfg(windows)'.dependencies]
+reqwest = { version = "0.11.13", features = ["blocking"] }
+openssl = { version = "0.10", features = ["vendored"] }
 
 [profile.release]
 strip = true
