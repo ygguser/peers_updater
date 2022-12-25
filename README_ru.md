@@ -52,10 +52,10 @@ sudo ./peers_updater -n 2 -u -a
 sudo ./peers_updater -n 2 -u -a -e "tcp://my.favorite.peer.ru:7777 tls://i.love.ru:7777"
 ```
 
-Обновление пиров (будет добавлен 1 пир). При этом, будут игнорироваться пиры, в URI которых встречаются: "tls:/ badpeer unstable.peer.far.away.from.me certain.port.peer.co:6767 377337":
+Обновление пиров (будет добавлен 1 пир). При этом, будут игнорироваться пиры, в URI которых встречаются: `tls:/ badpeer unstable.peer.su certain.port.peer.co:6767 1337`:
 
 ```
-sudo ./peers_updater -n 1 -u -i "tls:/ badpeer unstable.peer.far.away.from.me certain.port.peer.co:6767 7337"
+sudo ./peers_updater -n 1 -u -i "tls:/ badpeer unstable.peer.su certain.port.peer.co:6767 1337"
 ```
 
 По расписанию утилиту можно запускать с помощью cron (Linux) или с помощью другого планировщика (Windows). 
@@ -80,8 +80,29 @@ sudo crontab -e
 
 Проект собирается без ошибок и предупреждений с cargo 1.65.0 и rustc 1.65.0.
 
+### Linux (или MSYS2 + mingw)
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
 cargo build --release
 ```
+### Windows (MSVC)
+
+1. Установите rust с помощью установщика (rustup-init), выбрав пункт 1 - установка с помощью Visual Studio Community Installer
+2. Установите OpenSSL, скачав установщик со страницы: http://slproweb.com/products/Win32OpenSSL.html (не light версию; в дальнейшем предполагается, что OpenSSL установлен в каталог `C:\Program Files\OpenSSL-Win64` и бинарные файлы скопированы в `C:\Program Files\OpenSSL-Win64\bin\`. Если вы установили в другой каталог, откорректируйте пути ниже).
+3. Скачайте сертификат https://curl.se/ca/cacert.pem в каталог `C:\Program Files\OpenSSL-Win64\certs` (если этого каталога не существует, создайте его).
+4. Запустите командную строку с правами администратора. Дальнейшие действия выполняются в ней.
+5. Установка переменных среды:
+```
+setx /m OPENSSL_CONF "C:\Program Files\OpenSSL-Win64\bin\openssl.cfg"
+setx /m PATH %PATH%;"C:\Program Files\OpenSSL-Win64\bin"
+```
+6. Клонируйте (скачайте) репозиторий https://github.com/ygguser/peers_updater и перейдите в каталог `peers_updater`: `cd peers_updater`
+7. Установите следующие переменные среды окружения:
+```
+set OPENSSL_NO_VENDOR=1
+set RUSTFLAGS=-Ctarget-feature=+crt-static
+set SSL_CERT_FILE="C:\Program Files\OpenSSL-Win64\certs\cacert.pem"
+set OPENSSL_DIR=C:\Program Files\OpenSSL-Win64
+```
+8. Запустите сборку: `cargo build --release`
