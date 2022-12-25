@@ -83,5 +83,5 @@ sudo crontab -e
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
-cargo buid --release
+cargo build --release
 ```
