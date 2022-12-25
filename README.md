@@ -83,5 +83,5 @@ The project is being built without errors and warnings with cargo 1.65.0 and rus
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
-cargo buid --release
+cargo build --release
 ```
