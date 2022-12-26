@@ -80,13 +80,13 @@ sudo crontab -e
 
 Проект собирается без ошибок и предупреждений с cargo 1.65.0 и rustc 1.65.0.
 
-### Linux (или MSYS2 + mingw)
+##### Linux 
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
 cargo build --release
 ```
-### Windows (MSVC)
+##### Windows (MSVC)
 
 1. Установите rust с помощью установщика (rustup-init), выбрав пункт 1 - установка с помощью Visual Studio Community Installer
 2. Установите OpenSSL, скачав установщик со страницы: http://slproweb.com/products/Win32OpenSSL.html (не light версию; в дальнейшем предполагается, что OpenSSL установлен в каталог `C:\Program Files\OpenSSL-Win64` и бинарные файлы скопированы в `C:\Program Files\OpenSSL-Win64\bin\`. Если вы установили в другой каталог, откорректируйте пути ниже).

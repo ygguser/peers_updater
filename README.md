@@ -80,14 +80,14 @@ Now the peer nodes will be updated on Sundays at 0 o'clock.
 
 The project is being built without errors and warnings with cargo 1.65.0 and rustc 1.65.0.
 
-### Linux (or MSYS2 + mingw)
+##### Linux 
 
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
 cargo build --release
 ```
-### Windows (MSVC)
+##### Windows (MSVC)
 
 1. Install rust using the installer (rustup-init) by selecting item 1 - Quick Install via the Visual Studio Community Installer
 2. Install OpenSSL by downloading the installer from the page: http://slproweb.com/products/Win32OpenSSL.html (non-light version; in the following, it is assumed that OpenSSL is installed in the directory `C:\Program Files\OpenSSL-Win64` and the binaries are copied to `C:\Program Files\OpenSSL-Win64\bin\`. If you have installed in a different directory, adjust the paths below).
