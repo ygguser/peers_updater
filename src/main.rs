@@ -233,12 +233,13 @@ fn create_tmp_dir() -> io::Result<PathBuf> {
     Ok(tmp_dir.into_path())
 }
 
-fn download_archive(tmp_dir: &PathBuf) -> io::Result<bool> {
+type Res<T> = std::result::Result<T, Box<dyn std::error::Error>>;
+
+fn download_archive(tmp_dir: &PathBuf) -> Res<()> {
     let mut resp = reqwest::blocking::get(
         "https://github.com/yggdrasil-network/public-peers/archive/refs/heads/master.zip",
-    )
-    .expect("request failed");
+    )?;
     let mut out = File::create(format!("{}/peers.zip", tmp_dir.display()))?;
     io::copy(&mut resp, &mut out)?;
-    Ok(true)
+    Ok(())
 }
