@@ -16,7 +16,7 @@ clap = { version = "4.0.26", default-features = false, features = [
     "std",
 ] }
 dns-lookup = "1.0.8"
-nu-json = "0.71.0"
+nu-json = { version = "0.71.0", default-features = false }
 regex = { version = "1.7.0", default-features = false, features = ["std"] }
 tempfile = "3.3.0"
 walkdir = "2.3.2"
@@ -35,3 +35,7 @@ openssl = { version = "0.10", features = ["vendored"] }
 
 [profile.release]
 strip = true
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
