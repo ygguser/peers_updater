@@ -79,30 +79,8 @@ sudo crontab -e
 #### Сборка из исходников
 
 Проект собирается без ошибок и предупреждений с cargo 1.65.0 и rustc 1.65.0.
-
-##### Linux 
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
 cargo build --release
 ```
-##### Windows (MSVC)
-
-1. Установите rust с помощью установщика (rustup-init), выбрав пункт 1 - установка с помощью Visual Studio Community Installer
-2. Установите OpenSSL, скачав установщик со страницы: http://slproweb.com/products/Win32OpenSSL.html (не light версию; в дальнейшем предполагается, что OpenSSL установлен в каталог `C:\Program Files\OpenSSL-Win64` и бинарные файлы скопированы в `C:\Program Files\OpenSSL-Win64\bin\`. Если вы установили в другой каталог, откорректируйте пути ниже).
-3. Скачайте сертификат https://curl.se/ca/cacert.pem в каталог `C:\Program Files\OpenSSL-Win64\certs` (если этого каталога не существует, создайте его).
-4. Запустите командную строку с правами администратора. Дальнейшие действия выполняются в ней.
-5. Установка переменных среды:
-```
-setx /m OPENSSL_CONF "C:\Program Files\OpenSSL-Win64\bin\openssl.cfg"
-setx /m PATH %PATH%;"C:\Program Files\OpenSSL-Win64\bin"
-```
-6. Клонируйте (скачайте) репозиторий https://github.com/ygguser/peers_updater и перейдите в каталог `peers_updater`: `cd peers_updater`
-7. Установите следующие переменные среды окружения:
-```
-set OPENSSL_NO_VENDOR=1
-set RUSTFLAGS=-Ctarget-feature=+crt-static
-set SSL_CERT_FILE="C:\Program Files\OpenSSL-Win64\certs\cacert.pem"
-set OPENSSL_DIR=C:\Program Files\OpenSSL-Win64
-```
-8. Запустите сборку: `cargo build --release`
