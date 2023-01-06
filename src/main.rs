@@ -236,9 +236,11 @@ fn create_tmp_dir() -> io::Result<PathBuf> {
 type Res<T> = std::result::Result<T, Box<dyn std::error::Error>>;
 
 fn download_archive(tmp_dir: &PathBuf) -> Res<()> {
-    let mut resp = reqwest::blocking::get(
+    let mut resp = attohttpc::get(
         "https://github.com/yggdrasil-network/public-peers/archive/refs/heads/master.zip",
-    )?;
+    )
+    .send()?;
+
     let mut out = File::create(format!("{}/peers.zip", tmp_dir.display()))?;
     io::copy(&mut resp, &mut out)?;
     Ok(())

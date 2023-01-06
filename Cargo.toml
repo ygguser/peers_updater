@@ -23,15 +23,15 @@ walkdir = "2.3.2"
 uriparse = "0.6.4"
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 
-[target.'cfg(unix)'.dependencies]
-reqwest = { version = "0.11.13", default-features = false, features = [
-    "rustls-tls-native-roots",
-    "blocking",
+[target.'cfg(windows)'.dependencies]
+attohttpc = { version = "0.24.0", default-features = false, features = [
+    "tls-native", 
 ] }
 
-[target.'cfg(windows)'.dependencies]
-reqwest = { version = "0.11.13", features = ["blocking"] }
-openssl = { version = "0.10", features = ["vendored"] }
+[target.'cfg(unix)'.dependencies]
+attohttpc = { version = "0.24.0", default-features = false, features = [
+    "tls-rustls-native-roots",
+] }
 
 [profile.release]
 strip = true
