@@ -25,7 +25,11 @@ pub fn add_peers_to_conf_new(
     let mut new_peers = String::from("Peers:\n  [");
 
     let mut n_added: u8 = 0;
+    let mut added_hosts: Vec<String> = Vec::with_capacity(n_peers.into());
     for peer in peers {
+        if added_hosts.contains(&peer.addr) {
+            continue;
+        }
         new_peers.push_str(
             format!("\n    #{}/{}\n    {}", peer.region, peer.country, peer.uri).as_str(),
         );
@@ -33,6 +37,7 @@ pub fn add_peers_to_conf_new(
         if n_added == n_peers {
             break;
         }
+        added_hosts.push(peer.addr.to_owned());
     }
 
     //Always in

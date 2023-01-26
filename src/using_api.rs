@@ -41,7 +41,11 @@ pub fn update_peers(
 
     // Adding new peers
     let mut n_added: u8 = 0;
+    let mut added_hosts: Vec<String> = Vec::with_capacity(n_peers.into());
     for peer in peers {
+        if added_hosts.contains(&peer.addr) {
+            continue;
+        }
         response.clear();
         request(
             format!(
@@ -56,6 +60,7 @@ pub fn update_peers(
         if n_added == n_peers {
             break;
         }
+        added_hosts.push(peer.addr.to_owned());
     }
 
     //Always in
