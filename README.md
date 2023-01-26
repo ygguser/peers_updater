@@ -8,7 +8,7 @@ By setting up the automatic launch of the utility on a schedule, you can forget 
 Usage: peers_updater [OPTIONS]
 
 Options:
-  -p, --print           Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
+  -p, --print           Print the peers sorted by latency
   -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
   -u, --update_cfg      Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
   -a, --api             Add/remove peers during execution (requires enabling the admin API)
@@ -20,7 +20,7 @@ Options:
   -V, --version         Print version information
 ```
 
-To simply display a list of peers sorted by response time, use the `-p` parameter. At the same time, all other parameters will be ignored, no changes will be made to the configuration of Yggrasil.
+To simply display a list of peers sorted by response time, use the `-p` parameter (no changes will be made to the configuration of Yggrasil).
 
 In order for the utility to work fully and correctly, making changes to the Yggdrasil settings, the user with whose rights it is launched must have the appropriate permissions to change the configuration file and/or use the Admin API.
 
