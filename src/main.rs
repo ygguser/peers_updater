@@ -106,9 +106,20 @@ fn main() {
         Some(_i_p) => _i_p.as_str(),
         None => "",
     };
+
+    let ignored_countries: &str = match matches.get_one::<String>("ignore_country") {
+        Some(_i_c) => _i_c.as_str(),
+        None => "",
+    };
+
     // Collecting peers in a vector
     let mut peers: Vec<Peer> = Vec::new();
-    match crate::parsing_peers::collect_peers(&peers_dir, &mut peers, ignored_peers) {
+    match crate::parsing_peers::collect_peers(
+        &peers_dir,
+        &mut peers,
+        ignored_peers,
+        ignored_countries,
+    ) {
         Ok(_r) => _r,
         Err(e) => {
             eprintln!("Couldn't get peer addresses from downloaded files ({}).", e);

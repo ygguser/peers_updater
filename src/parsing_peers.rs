@@ -7,7 +7,12 @@ use std::path::PathBuf;
 use std::process;
 use walkdir::WalkDir;
 
-pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> io::Result<bool> {
+pub fn collect_peers(
+    path: &PathBuf,
+    v: &mut Vec<Peer>,
+    ignored_peers_str: &str,
+    ignored_countries_str: &str,
+) -> io::Result<bool> {
     let re = match Regex::new(r"(tcp|tls)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
         Ok(_r) => _r,
         Err(e) => {
@@ -16,12 +21,14 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
         }
     };
 
-    let ignored: &Vec<&str> = &(ignored_peers.split(' ').collect());
+    let ignored_peers: &Vec<&str> = &(ignored_peers_str.split(' ').collect());
+    let ignored_countries: &Vec<&str> = &(ignored_countries_str.split(' ').collect());
 
     for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
         if file.metadata().unwrap().is_file() {
             //println!("{}", file.path().display());
             let p: &std::path::Path = file.path();
+
             let country = match p.file_stem() {
                 Some(_c) => match _c.to_os_string().into_string() {
                     Ok(_co) => _co,
@@ -29,6 +36,11 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
                 },
                 _ => "Unknown".to_string(),
             };
+
+            if ignored_countries.contains(&country.as_str()) {
+                continue;
+            }
+
             let region = match p.parent() {
                 Some(_r) => match _r.file_stem() {
                     Some(_re) => match _re.to_os_string().into_string() {
@@ -52,7 +64,7 @@ pub fn collect_peers(path: &PathBuf, v: &mut Vec<Peer>, ignored_peers: &str) -> 
                                 }
                             };
                             let mut skip = false;
-                            for ig in ignored.into_iter() {
+                            for ig in ignored_peers.into_iter() {
                                 if (!ig.is_empty()) && uri.contains(ig.replace("\"", "").as_str()) {
                                     skip = true;
                                     break;

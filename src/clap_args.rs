@@ -53,6 +53,11 @@ pub fn build_args() -> clap::ArgMatches {
         .required(false))
     .arg(
         arg!(
+            -I --ignore_country <VALUE> "A space-separated string containing the names of countries that will not be added to the configuration"
+        )
+        .required(false))    
+    .arg(
+        arg!(
             -r --restart "Restart the Yggdrasil (systemd or windows) service"
         )
         .required(false)

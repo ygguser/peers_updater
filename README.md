@@ -15,6 +15,7 @@ Options:
   -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
   -e, --extra <VALUE>   A space-separated string with the URIs of the peers that should always be in the configuration
   -i, --ignore <VALUE>  A space-separated string of characters. Peers whose URIs contain combinations of characters will not be added to the configuration
+  -I, --ignore_country <VALUE> A space-separated string containing the names of countries that will not be added to the configuration
   -r, --restart         Restart the Yggdrasil (systemd or windows) service
   -h, --help            Print help information
   -V, --version         Print version information
