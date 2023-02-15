@@ -28,6 +28,7 @@ In order for the utility to work fully and correctly, making changes to the Yggd
 It doesn't make sense to use the `-r` (restart Yggdrasil) and `-a` (use admin API) flags at the same time.
 
 **Please note:** the `-i` (`--ignore`) and `-I` (`--ignore_country`) options must be used judiciously. The fact is that Yggdrasil developers [recommend](https://github.com/yggdrasil-network/public-peers#how-do-i-pick-peers) using 2-3 public peers that are geographically closest to you to connect to the network. Geographically closest - in order for the connection delay to be minimal and the connection to be more stable.
+
 [peer_updater](https://github.com/ygguser/peers_updater) automatically selects peers with the fastest response time, but using the options mentioned above you can [accidentally] ignore peers closest to you and thus increase the load on your peer and reduce the quality of the connection.
 
 #### Usage Examples
