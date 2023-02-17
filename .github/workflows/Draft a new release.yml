@@ -17,22 +17,26 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Getting version
         run: echo "VERSION=$(sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml | tr -d '\"')" >> $GITHUB_ENV
         
-  draft_release:
-    name: Draft release
+  create_release_draft:
+    name: Create the release draft
     runs-on: ubuntu-latest
-    #outputs:
-     # draft_id: ${{ env.DID }}
+    outputs:
+      release_id: ${{ steps.create-release-draft.outputs.id }}
     needs: get_version
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
-      - name: Create release
+
+      - name: Create release draft
+        id: create-release-draft
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,20 +48,16 @@ jobs:
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
-  build-and-upload:
+  build_and_upload:
     name: Create and upload binaries
-    needs: [ draft_release, get_version ]
+    needs: [ create_release_draft ]
     runs-on: ubuntu-latest
-    #timeout-minutes: 80
     strategy:
       matrix:
         target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
-    #defaults:
-      #run:
-        #shell: bash
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         
       - name: Preparing for cross-compilation
         run: |
@@ -68,14 +68,13 @@ jobs:
           rustup component add rust-src --toolchain nightly
           
       - name: Build and compress binaries
-        #timeout-minutes: 60
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
 
       - name: Add archives to the release draft
         uses: xresloader/upload-to-github-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.draft_release.outputs.id }}
+          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
         with:
           release_id: ${{ env.RELEASE_ID }}
           file: "${{ github.workspace }}/target/*/release/*.zip"
