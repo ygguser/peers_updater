@@ -69,9 +69,15 @@ jobs:
         timeout-minutes: 60
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
 
-      - name: Add archives to the release
+      - name: Add archives to the release draft
+        uses: xresloader/upload-to-github-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          tag_name="${{ needs.get_version.outputs.release_version }}"
-          hub release edit $(find ./ -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name"
+        with:
+          file: "${{ github.workspace }}/target/*/release/*.zip"
+          draft: true
+         # env:
+           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       # run: |
+         # tag_name="${{ needs.get_version.outputs.release_version }}"
+          #hub release edit $(find ./ -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name"
