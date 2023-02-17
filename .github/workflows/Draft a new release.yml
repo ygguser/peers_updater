@@ -13,7 +13,7 @@ jobs:
     name: Get version from Cargo.toml
     runs-on: ubuntu-latest
     outputs:
-      project_version: ${{ env.VERSION }}
+      release_version: ${{ env.VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -34,6 +34,7 @@ jobs:
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.get_version.outputs.release_version }}
         with:
           #tag_name: ${{ github.ref }}
           tag_name: ${{ env.VERSION }}
