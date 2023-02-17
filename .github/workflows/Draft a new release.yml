@@ -74,4 +74,4 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           tag_name="${{ needs.get_version.outputs.release_version }}"
-          hub release edit $(find ./bin -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name" "$tag_name"
+          hub release edit $(find ./ -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name"
