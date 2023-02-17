@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Getting version
         #run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
-        run: sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml  | tr -d '"' >> $GITHUB_ENV
+        run: sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml >> $GITHUB_ENV
         
   build:
     name: Create release
