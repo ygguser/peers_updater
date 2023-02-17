@@ -3,7 +3,7 @@ name: Draft a new release
 on:
   push:
     #tags: v[0-9].[0-9]+.[0-9]+
-    workflow_dispatch:
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
