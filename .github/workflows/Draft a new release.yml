@@ -18,7 +18,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Getting version
-        #run: echo "VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
         run: echo "VERSION=$(sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml | tr -d '\"')" >> $GITHUB_ENV
         
   build:
@@ -36,8 +35,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Peers updater v. {{ env.VERSION }}
+          #tag_name: ${{ github.ref }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Peers updater v. ${{ env.VERSION }}
           draft: true
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
