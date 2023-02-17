@@ -62,9 +62,9 @@ jobs:
           cargo install cross
           rustup update
           rustup toolchain install nightly
-          ustup component add rust-src --toolchain nightly
+          rustup component add rust-src --toolchain nightly
           
-      - name: Build and compression of binaries by zip
+      - name: Build and compress binaries
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
 
       - name: Add archives to the release
