@@ -2,7 +2,7 @@ name: Draft a new release
 
 on:
   push:
-    #tags: v[0-9].[0-9]+.[0-9]+
+    #tags: "[0-9].[0-9].[0-9]"
   workflow_dispatch:
 
 env:
@@ -23,6 +23,8 @@ jobs:
   draft_release:
     name: Draft release
     runs-on: ubuntu-latest
+    #outputs:
+     # draft_id: ${{ env.DID }}
     needs: get_version
     steps:
       - name: Checkout
@@ -42,11 +44,11 @@ jobs:
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
-  build-and-aupload:
+  build-and-upload:
     name: Create and upload binaries
     needs: [ draft_release, get_version ]
     runs-on: ubuntu-latest
-    timeout-minutes: 80
+    #timeout-minutes: 80
     strategy:
       matrix:
         target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
@@ -66,14 +68,16 @@ jobs:
           rustup component add rust-src --toolchain nightly
           
       - name: Build and compress binaries
-        timeout-minutes: 60
+        #timeout-minutes: 60
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
 
       - name: Add archives to the release draft
         uses: xresloader/upload-to-github-release@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.draft_release.outputs.id }}
         with:
+          release_id: ${{ env.RELEASE_ID }}
           file: "${{ github.workspace }}/target/*/release/*.zip"
           draft: true
          # env:
