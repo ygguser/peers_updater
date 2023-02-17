@@ -16,12 +16,12 @@ jobs:
       release_version: ${{ env.VERSION }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Getting version
         run: echo "VERSION=$(sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml | tr -d '\"')" >> $GITHUB_ENV
         
-  build:
-    name: Create release
+  draft_release:
+    name: Draft release
     runs-on: ubuntu-latest
     needs: get_version
     steps:
@@ -36,9 +36,40 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VERSION: ${{ needs.get_version.outputs.release_version }}
         with:
-          #tag_name: ${{ github.ref }}
           tag_name: ${{ env.VERSION }}
           release_name: Peers updater v. ${{ env.VERSION }}
           draft: true
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
+
+  linux-nogui:
+    name: Create and upload binaries
+    needs: [ draft_release, get_version ]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
+    #defaults:
+      #run:
+        #shell: bash
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Preparing for cross-compilation
+        run: |
+          sudo apt update && sudo apt upgrade && sudo apt install zip upx
+          cargo install cross
+          rustup update
+          rustup toolchain install nightly
+          ustup component add rust-src --toolchain nightly
+          
+      - name: Build and compression of binaries by zip
+        run: .github/workflows/build+zip.sh ${{ matrix.target }}        
+
+      - name: Add archives to the release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag_name="${{ needs.get_version.outputs.release_version }}"
+          hub release edit $(find ./bin -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name" "$tag_name"
