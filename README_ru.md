@@ -1,5 +1,7 @@
 ### Yggrasil network peers checker / updater
 
+[![Статус сборки](https://github.com/ygguser/peers_updater/actions/workflows/Draft%20a%20new%20release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Draft%20a%20new%20release.yml)
+
 Утилита предназначена для проверки доступности пиров и автоматического их обновления в конфигурационном файле Yggdrasil, а так же, с помощью метода admin API - addPeer.
 
 Настроив автоматический запуск утилиты по расписанию, можно забыть о том, что публичные пиры иногда перестают работать и нужно их обновлять вручную.

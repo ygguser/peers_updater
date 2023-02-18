@@ -1,5 +1,7 @@
 ### Yggrasil network peers checker / updater
 
+[![Build status](https://github.com/ygguser/peers_updater/actions/workflows/Draft%20a%20new%20release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Draft%20a%20new%20release.yml)
+
 The utility is designed to check the availability of peers and automatically update them in the Yggdrasil configuration file, as well as using the admin API - addPeer method.
 
 By setting up the automatic launch of the utility on a schedule, you can forget that public peers sometimes stop working and you need to update them manually.
