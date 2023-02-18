@@ -1,8 +1,8 @@
-name: Draft a new release
+name: Build
 
 on:
   push:
-    #tags: "[0-9].[0-9].[0-9]"
+    tags: "[0-9].[0-9]+.[0-9]+"
   workflow_dispatch:
 
 env:
@@ -79,8 +79,3 @@ jobs:
           release_id: ${{ env.RELEASE_ID }}
           file: "${{ github.workspace }}/target/*/release/*.zip"
           draft: true
-         # env:
-           # GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-       # run: |
-         # tag_name="${{ needs.get_version.outputs.release_version }}"
-          #hub release edit $(find ./ -type f -name "*.zip" -printf "-a %p ") -m "Peers updater v. $tag_name"
