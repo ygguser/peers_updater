@@ -1,6 +1,6 @@
 [package]
 name = "peers_updater"
-version = "0.1.0"
+version = "0.1"
 edition = "2021"
 authors = ["YggUser (https://matrix.to/#/@ygguser:matrix.org)"]
 readme = "README.md"
