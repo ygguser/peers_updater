@@ -26,7 +26,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 - in case of vulnerabilities.
 -->
 
-## [0.1.0] - 
+## [0.1] - 
 
 ### Added
 
