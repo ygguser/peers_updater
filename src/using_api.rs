@@ -135,6 +135,8 @@ fn remove_peer(peer_uri: &String, socket_addr: &SockAddr, resp: &mut String) {
 
 fn remove_peers(getpeers_resp: &mut String, socket_addr: &SockAddr) {
     //parse to obj
+    //Serde deserialization is not used in order to get smaller binary files.
+
     let connected_peers: Map<String, nu_json::Value> = match nu_json::from_str(getpeers_resp) {
         Ok(cp) => cp,
         Err(e) => {
