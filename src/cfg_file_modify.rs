@@ -54,15 +54,12 @@ pub fn add_peers_to_conf_new(
     char_vec.splice(peers_start_pos..peers_end_pos + 1, new_peers.chars());
 
     if let Ok(mut f) = File::create(&conf_path) {
-        let _ = match f.write_all(char_vec.into_iter().collect::<String>().as_bytes()) {
-            Ok(_) => {}
-            Err(e) => {
-                eprintln!(
-                    "The changes could not be written to the configuration file ({}).",
-                    e
-                );
-            }
-        };
+        if let Err(e) = f.write_all(char_vec.into_iter().collect::<String>().as_bytes()) {
+            eprintln!(
+                "The changes could not be written to the configuration file ({}).",
+                e
+            );
+        }
     } else {
         eprintln!("The changes could not be written to the configuration file.");
     }

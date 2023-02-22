@@ -98,22 +98,16 @@ fn request(req: &str, socket_addr: &SockAddr, resp: &mut String) {
     match connection {
         Connection::Tcp(conn) => {
             let mut mut_conn = conn;
-            let _ = match socket_io(&mut mut_conn, req, resp) {
-                Ok(_) => {}
-                Err(e) => {
-                    eprintln!("Socket I/O error ({}).", e);
-                }
-            };
+            if let Err(e) = socket_io(&mut mut_conn, req, resp) {
+                eprintln!("Socket I/O error ({}).", e);
+            }
         }
         #[cfg(not(target_os = "windows"))]
         Connection::Unix(conn) => {
             let mut mut_conn = conn;
-            let _ = match socket_io(&mut mut_conn, req, resp) {
-                Ok(_) => {}
-                Err(e) => {
-                    eprintln!("Socket I/O error ({}).", e);
-                }
-            };
+            if let Err(e) = socket_io(&mut mut_conn, req, resp) {
+                eprintln!("Socket I/O error ({}).", e);
+            }
         }
         Connection::None => {
             eprintln!("Unable to connect to the administrator socket.");
