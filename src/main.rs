@@ -1,7 +1,7 @@
 use crate::peer::Peer;
 use nu_json::Map;
 use std::fs;
-use std::fs::File;
+
 use std::io;
 use std::path::PathBuf;
 use std::process;
@@ -10,6 +10,7 @@ use tempfile::Builder;
 mod cfg_file_modify;
 mod clap_args;
 mod defaults;
+mod download_file;
 mod latency;
 mod parse_config;
 mod parsing_peers;
@@ -70,7 +71,7 @@ fn main() {
     };
 
     // Download the archive with peers
-    let _res = match download_archive(&tmp_dir) {
+    let _res = match download_file::download_archive(&tmp_dir, "peers.zip") {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to download archive with peers ({}).", e);
@@ -242,17 +243,4 @@ fn check_permissions(path: &PathBuf) -> io::Result<bool> {
 fn create_tmp_dir() -> io::Result<PathBuf> {
     let tmp_dir = Builder::new().prefix("peers_updater_").tempdir()?;
     Ok(tmp_dir.into_path())
-}
-
-type Res<T> = std::result::Result<T, Box<dyn std::error::Error>>;
-
-fn download_archive(tmp_dir: &PathBuf) -> Res<()> {
-    let mut resp = attohttpc::get(
-        "https://github.com/yggdrasil-network/public-peers/archive/refs/heads/master.zip",
-    )
-    .send()?;
-
-    let mut out = File::create(format!("{}/peers.zip", tmp_dir.display()))?;
-    io::copy(&mut resp, &mut out)?;
-    Ok(())
 }
