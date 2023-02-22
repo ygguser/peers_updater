@@ -1,3 +1,10 @@
+# ---------------------------------------------------------------------------------------------
+# Copyright (C) ygguser 2023.
+# https://github.com/ygguser
+#
+# Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
+# ---------------------------------------------------------------------------------------------
+
 name: Build & Release
 
 on:
