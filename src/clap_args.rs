@@ -1,4 +1,4 @@
-use clap::{arg, value_parser, Arg, ArgAction};
+use clap::{arg, value_parser, Arg};
 use std::path::PathBuf;
 
 pub fn build_args() -> clap::ArgMatches {
@@ -11,7 +11,6 @@ pub fn build_args() -> clap::ArgMatches {
             -p --print "Print the peers sorted by latency. When using this parameter, all other parameters will be ignored."
         )
         .required(false)
-        .action(ArgAction::SetTrue)
     )
     .arg(
         Arg::new("config")
@@ -59,6 +58,12 @@ pub fn build_args() -> clap::ArgMatches {
     .arg(
         arg!(
             -r --restart "Restart the Yggdrasil (systemd or windows) service"
+        )
+        .required(false)
+    )
+    .arg(
+        arg!(
+            -S --self_update "Self-updating of this utility. An executable file will be downloaded from the releases on GitHub (if a newer version is published there) and the current one will be replaced with a new one."
         )
         .required(false)
     )

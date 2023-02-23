@@ -5,7 +5,6 @@ use std::fs;
 use std::io;
 use std::path::PathBuf;
 use std::process;
-use tempfile::Builder;
 
 mod cfg_file_modify;
 mod clap_args;
@@ -16,11 +15,18 @@ mod parse_config;
 mod parsing_peers;
 mod peer;
 mod resolve;
+mod self_updating;
+mod tmpfile;
 mod unpack;
 mod using_api;
 
 fn main() {
     let matches = clap_args::build_args();
+
+    if matches.get_flag("self_update") {
+        self_updating::self_update();
+        process::exit(0);
+    }
 
     let print_only = matches.get_flag("print");
     let update_cfg = matches.get_flag("update_cfg");
@@ -49,20 +55,17 @@ fn main() {
         }
 
         // Checking write access to the configuration file
-        let _t = match check_permissions(&conf_path) {
-            Ok(_ro) => _ro,
-            Err(e) => {
-                eprintln!(
-                    "There is no write access to the Yggdrasil configuration file ({}).",
-                    e
-                );
-                process::exit(1);
-            }
-        };
+        if let Err(e) = check_permissions(&conf_path) {
+            eprintln!(
+                "There is no write access to the Yggdrasil configuration file ({}).",
+                e
+            );
+            process::exit(1);
+        }
     }
 
     // Creating a temporary directory
-    let tmp_dir = match create_tmp_dir() {
+    let tmp_dir = match tmpfile::create_tmp_dir(None) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to create a temporary directory ({}).", e);
@@ -71,31 +74,29 @@ fn main() {
     };
 
     // Download the archive with peers
-    let _res = match download_file::download_archive(&tmp_dir, "peers.zip") {
-        Ok(val) => val,
-        Err(e) => {
-            eprintln!("Failed to download archive with peers ({}).", e);
-            process::exit(1);
-        }
-    };
+    if let Err(e) = download_file::download_archive(
+        "https://github.com/yggdrasil-network/public-peers/archive/refs/heads/master.zip",
+        &tmp_dir,
+        "peers.zip",
+    ) {
+        eprintln!("Failed to download archive with peers ({}).", e);
+        process::exit(1);
+    }
 
     // Unpacking the downloaded archive
-    let _res = match crate::unpack::unpack_archive(&tmp_dir) {
-        Ok(val) => val,
-        Err(e) => {
-            eprintln!("Failed to unpack archive ({}).", e);
-            process::exit(1);
-        }
-    };
+    if let Err(e) = crate::unpack::unpack_archive(&tmp_dir, "peers.zip") {
+        eprintln!("Failed to unpack archive ({}).", e);
+        process::exit(1);
+    }
 
     // Deleting unnecessary files
-    let _ret = fs::remove_file(std::path::Path::new(
+    let _ = fs::remove_file(std::path::Path::new(
         format!("{}/public-peers-master/README.md", &tmp_dir.display()).as_str(),
     ));
-    let _ret = fs::remove_file(std::path::Path::new(
+    let _ = fs::remove_file(std::path::Path::new(
         format!("{}/peers.zip", &tmp_dir.display()).as_str(),
     ));
-    let _ret = fs::remove_dir_all(std::path::Path::new(
+    let _ = fs::remove_dir_all(std::path::Path::new(
         format!("{}/public-peers-master/other", &tmp_dir.display()).as_str(),
     ));
 
@@ -115,21 +116,18 @@ fn main() {
 
     // Collecting peers in a vector
     let mut peers: Vec<Peer> = Vec::new();
-    match crate::parsing_peers::collect_peers(
+    if let Err(e) = crate::parsing_peers::collect_peers(
         &peers_dir,
         &mut peers,
         ignored_peers,
         ignored_countries,
     ) {
-        Ok(_r) => _r,
-        Err(e) => {
-            eprintln!("Couldn't get peer addresses from downloaded files ({}).", e);
-            process::exit(1);
-        }
+        eprintln!("Couldn't get peer addresses from downloaded files ({}).", e);
+        process::exit(1);
     };
 
     // Deleting unnecessary files
-    let _ret = fs::remove_dir_all(std::path::Path::new(tmp_dir.as_path()));
+    let _ = fs::remove_dir_all(std::path::Path::new(tmp_dir.as_path()));
 
     // Calculating latency
     std::thread::scope(|scope| {
@@ -238,9 +236,4 @@ fn check_permissions(path: &PathBuf) -> io::Result<bool> {
     let md = fs::metadata(path)?;
     let permissions = md.permissions();
     Ok(permissions.readonly())
-}
-
-fn create_tmp_dir() -> io::Result<PathBuf> {
-    let tmp_dir = Builder::new().prefix("peers_updater_").tempdir()?;
-    Ok(tmp_dir.into_path())
 }

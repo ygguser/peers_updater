@@ -1,8 +1,8 @@
 use std::fs;
 use std::path::PathBuf;
 
-pub fn unpack_archive(tmp_dir: &PathBuf) -> std::io::Result<bool> {
-    let file = fs::File::open(format!("{}/peers.zip", tmp_dir.display()))?;
+pub fn unpack_archive(tmp_dir: &PathBuf, fname: &str) -> std::io::Result<bool> {
+    let file = fs::File::open(format!("{}/{}", tmp_dir.display(), fname))?;
     let mut archive = zip::ZipArchive::new(file)?;
 
     for i in 0..archive.len() {

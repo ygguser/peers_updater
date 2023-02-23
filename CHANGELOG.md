@@ -26,6 +26,38 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - in case of vulnerabilities.
 -->
 
+## [0.2.0] - 
+
+### Added
+
+- Added the `-S` (`--self_update`) option. 
+
+Starting from this version, it will be possible to update the utility by running it with the `-S` option. This is done for the simplicity and convenience of updating. You will no longer need to manually download the release from GitHub, unpack and manually replace the executable file - the utility will do all this automatically.
+
+**Usage example:**
+
+Checking the version:
+```
+./peers_updater -V
+Yggdrasil peers updater 0.2.0
+```
+```
+./peers_updater -S
+New release found: 0.2.0 --> 0.2.1
+Downloading...
+Extracting...
+Replacing binary file...
+Done.
+```
+Checking the version again:
+```
+./peers_updater -V
+Yggdrasil peers updater 0.2.1
+```
+Here we see that the program has been successfully updated.
+
+The utility with the `-S` option can be run on a schedule (cron, windows scheduler) or manually.
+
 ## [0.1.0] - 2023-02-18
 
 ### Added
