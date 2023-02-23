@@ -178,17 +178,18 @@ fn get_latest_version(
         }
     };
 
-    let url = get_asset_url(&as_array, target);
-    if url.is_empty() {
-        eprintln!("No asset found for target: {}", target);
-        ::std::process::exit(1);
-    }
+    let url = match get_asset_url(&as_array, target) {
+        Some(_u) => _u,
+        None => {
+            eprintln!("No asset found for target: {}", target);
+            ::std::process::exit(1);
+        }
+    };
 
     Ok(GitHubVersion { tag_name, url })
 }
 
-fn get_asset_url(as_array: &Vec<nu_json::Value>, target: &str) -> String {
-    //let mut URL = std::borrow::Cow::Borrowed("");
+fn get_asset_url(as_array: &Vec<nu_json::Value>, target: &str) -> Option<String> {
     for asset in as_array {
         let as_obj = match asset.as_object() {
             Some(_ao) => _ao,
@@ -205,11 +206,11 @@ fn get_asset_url(as_array: &Vec<nu_json::Value>, target: &str) -> String {
         };
 
         if as_url.contains(target) {
-            return as_url;
+            return Some(as_url);
         }
     }
 
-    String::new()
+    None
 }
 
 fn replace_executable_file(
