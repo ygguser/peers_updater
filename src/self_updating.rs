@@ -134,7 +134,6 @@ pub fn self_update() {
     replace_executable_file(&new_file, &exe_path, &tmp_exec_file_name);
 
     // Cleanup
-    //let _ = std::fs::remove_file(&tmp_exec_file_name);
     let _ = std::fs::remove_dir_all(&tmp_dir);
 
     println!("Done.");

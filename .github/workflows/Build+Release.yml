@@ -66,7 +66,7 @@ jobs:
         
       - name: Preparing for cross-compilation
         run: |
-          sudo apt update && sudo apt upgrade && sudo apt install zip upx
+          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx
           cargo install cross
           rustup update
           rustup toolchain install nightly
