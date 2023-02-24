@@ -48,7 +48,10 @@ fn collect_files(
                 region,
             });
         } else {
-            let _ = collect_files(&path, &mut file_patches, ignored_countries);
+            if let Err(e) = collect_files(&path, &mut file_patches, ignored_countries) {
+                eprintln!("Failed to collect *.md files ({}).", e);
+                process::exit(1);
+            }
         }
     }
 
@@ -64,7 +67,7 @@ pub fn collect_peers(
     let re = match Regex::new(r"(tcp|tls)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
         Ok(_r) => _r,
         Err(e) => {
-            eprintln!("Failed to parse files ({}).", e);
+            eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
             process::exit(1);
         }
     };
@@ -73,7 +76,10 @@ pub fn collect_peers(
     let ignored_countries: &Vec<&str> = &(ignored_countries_str.split(' ').collect());
 
     let mut pp_files: Vec<PPFile> = Default::default();
-    let _ = collect_files(&path, &mut pp_files, ignored_countries);
+    if let Err(e) = collect_files(&path, &mut pp_files, ignored_countries) {
+        eprintln!("Failed to collect *.md files ({}).", e);
+        process::exit(1);
+    }
 
     for pp_file in pp_files {
         // Reading a file
