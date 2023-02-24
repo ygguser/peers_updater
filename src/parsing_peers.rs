@@ -5,7 +5,55 @@ use std::io;
 use std::io::BufRead;
 use std::path::PathBuf;
 use std::process;
-use walkdir::WalkDir;
+
+struct PPFile {
+    path: std::path::PathBuf,
+    region: String,
+    country: String,
+}
+
+fn collect_files(
+    dir: &std::path::PathBuf,
+    mut file_patches: &mut Vec<PPFile>,
+    ignored_countries: &Vec<&str>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    for entry in std::fs::read_dir(dir)? {
+        let entry = entry?;
+        let path = entry.path();
+        let metadata = std::fs::metadata(&path)?;
+        if metadata.is_file() {
+            let country = match path.file_stem() {
+                Some(_c) => match _c.to_os_string().into_string() {
+                    Ok(_co) => _co,
+                    _ => "Unknown".to_string(),
+                },
+                _ => "Unknown".to_string(),
+            };
+
+            if ignored_countries.contains(&country.as_str()) {
+                continue;
+            }
+
+            let region = match dir.file_stem() {
+                Some(_r) => match _r.to_os_string().into_string() {
+                    Ok(_reg) => _reg,
+                    _ => "Unknown".to_string(),
+                },
+                _ => "Unknown".to_string(),
+            };
+
+            file_patches.push(PPFile {
+                path,
+                country,
+                region,
+            });
+        } else {
+            let _ = collect_files(&path, &mut file_patches, ignored_countries);
+        }
+    }
+
+    Ok(())
+}
 
 pub fn collect_peers(
     path: &PathBuf,
@@ -24,72 +72,47 @@ pub fn collect_peers(
     let ignored_peers: &Vec<&str> = &(ignored_peers_str.split(' ').collect());
     let ignored_countries: &Vec<&str> = &(ignored_countries_str.split(' ').collect());
 
-    for file in WalkDir::new(path).into_iter().filter_map(|file| file.ok()) {
-        if file.metadata().unwrap().is_file() {
-            //println!("{}", file.path().display());
-            let p: &std::path::Path = file.path();
+    let mut pp_files: Vec<PPFile> = Default::default();
+    let _ = collect_files(&path, &mut pp_files, ignored_countries);
 
-            let country = match p.file_stem() {
-                Some(_c) => match _c.to_os_string().into_string() {
-                    Ok(_co) => _co,
-                    _ => "Unknown".to_string(),
-                },
-                _ => "Unknown".to_string(),
-            };
-
-            if ignored_countries.contains(&country.as_str()) {
-                continue;
-            }
-
-            let region = match p.parent() {
-                Some(_r) => match _r.file_stem() {
-                    Some(_re) => match _re.to_os_string().into_string() {
-                        Ok(_reg) => _reg,
-                        _ => "Unknown".to_string(),
-                    },
-                    _ => "Unknown".to_string(),
-                },
-                _ => "Unknown".to_string(),
-            };
-
-            // Reading a file
-            if let Ok(lines) = read_lines(file.path()) {
-                for line in lines {
-                    if let Ok(str) = line {
-                        for peer_ in re.captures_iter(str.as_str()) {
-                            let uri = match peer_.get(0) {
-                                Some(_u) => _u.as_str().to_string(),
-                                None => {
-                                    continue;
-                                }
-                            };
-                            let mut skip = false;
-                            for ig in ignored_peers.into_iter() {
-                                if (!ig.is_empty()) && uri.contains(ig.replace("\"", "").as_str()) {
-                                    skip = true;
-                                    break;
-                                }
-                            }
-                            if skip {
+    for pp_file in pp_files {
+        // Reading a file
+        if let Ok(lines) = read_lines(pp_file.path) {
+            for line in lines {
+                if let Ok(str) = line {
+                    for peer_ in re.captures_iter(str.as_str()) {
+                        let uri = match peer_.get(0) {
+                            Some(_u) => _u.as_str().to_string(),
+                            None => {
                                 continue;
                             }
-                            v.push(Peer::new(
-                                uri,
-                                peer_
-                                    .get(2)
-                                    .map_or("".to_string(), |m| m.as_str().to_string()),
-                                peer_
-                                    .get(3)
-                                    .map_or("".to_string(), |m| m.as_str().to_string()),
-                                // peer_
-                                //     .get(1)
-                                //     .map_or("".to_string(), |m| m.as_str().to_string()),
-                                region.to_owned(),
-                                country.to_owned(),
-                                false,
-                                99999,
-                            ));
+                        };
+                        let mut skip = false;
+                        for ig in ignored_peers.into_iter() {
+                            if (!ig.is_empty()) && uri.contains(ig.replace("\"", "").as_str()) {
+                                skip = true;
+                                break;
+                            }
                         }
+                        if skip {
+                            continue;
+                        }
+                        v.push(Peer::new(
+                            uri,
+                            peer_
+                                .get(2)
+                                .map_or("".to_string(), |m| m.as_str().to_string()),
+                            peer_
+                                .get(3)
+                                .map_or("".to_string(), |m| m.as_str().to_string()),
+                            // peer_
+                            //     .get(1)
+                            //     .map_or("".to_string(), |m| m.as_str().to_string()),
+                            pp_file.region.to_owned(),
+                            pp_file.country.to_owned(),
+                            false,
+                            99999,
+                        ));
                     }
                 }
             }

@@ -19,7 +19,6 @@ dns-lookup = "1.0.8"
 nu-json = { version = "0.75.0", default-features = false }
 regex = { version = "1.7.1", default-features = false, features = ["std"] }
 tempfile = "3.3.0"
-walkdir = "2.3.2"
 uriparse = "0.6.4"
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 
