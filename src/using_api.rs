@@ -249,30 +249,45 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
         }
     } else {
         //tcp
-        let parse_res = match url_parse::core::Parser::new(None).parse(string_addr.as_str()) {
-            Ok(_pr) => _pr,
+        //Parsing the URI of the admin socket
+        let re = match regex::Regex::new(r"(tcp|tls)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
+            Ok(_r) => _r,
             Err(e) => {
-                eprintln!("Unable to parse socket URI ({:?}).", e);
+                eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
+                std::process::exit(1);
+            }
+        };
+        let mut cap_iter = re.captures_iter(string_addr.as_str());
+        let cap = match cap_iter.next() {
+            Some(_c) => _c,
+            None => {
+                eprintln!("Unable to parse socket URI ({}).", string_addr);
                 return SockAddr::None;
             }
         };
 
-        let host = match parse_res.domain {
-            Some(_h) => _h,
-            _ => {
-                eprintln!("Unable to parse socket URI (failed to get host from URI).");
+        let host = match cap.get(2) {
+            Some(_h) => _h.as_str(),
+            None => {
+                eprintln!(
+                    "Unable to parse socket URI (failed to get host from URI ({})).",
+                    string_addr
+                );
+                return SockAddr::None;
+            }
+        };
+        let port = match cap.get(3) {
+            Some(_p) => _p.as_str(),
+            None => {
+                eprintln!(
+                    "Unable to parse socket URI (failed to get port from URI ({})).",
+                    string_addr
+                );
                 return SockAddr::None;
             }
         };
 
-        let port = match parse_res.port {
-            Some(_p) => _p,
-            _ => {
-                eprintln!("Unable to parse socket URI (failed to get port from URI).");
-                return SockAddr::None;
-            }
-        };
-
+        //getting a socket address
         let mut addrs_iter = match format!("{}:{}", host, port).to_socket_addrs() {
             Ok(_a) => _a,
             Err(e) => {
