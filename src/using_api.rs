@@ -249,16 +249,15 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
         }
     } else {
         //tcp
-        let string_addr = string_addr.replace("\"", "");
-        let uri = match uriparse::URI::try_from(string_addr.as_str()) {
-            Ok(_u) => _u,
+        let parse_res = match url_parse::core::Parser::new(None).parse(string_addr.as_str()) {
+            Ok(_pr) => _pr,
             Err(e) => {
-                eprintln!("Unable to parse socket URI ({}).", e);
+                eprintln!("Unable to parse socket URI ({:?}).", e);
                 return SockAddr::None;
             }
         };
 
-        let host = match uri.host() {
+        let host = match parse_res.domain {
             Some(_h) => _h,
             _ => {
                 eprintln!("Unable to parse socket URI (failed to get host from URI).");
@@ -266,7 +265,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
             }
         };
 
-        let port = match uri.port() {
+        let port = match parse_res.port {
             Some(_p) => _p,
             _ => {
                 eprintln!("Unable to parse socket URI (failed to get port from URI).");

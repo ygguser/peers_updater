@@ -18,7 +18,7 @@ clap = { version = "4.1.6", default-features = false, features = [
 nu-json = { version = "0.75.0", default-features = false }
 regex = { version = "1.7.1", default-features = false, features = ["std"] }
 tempfile = "3.3.0"
-uriparse = "0.6.4"
+url-parse = "1.0.5"
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 
 [target.'cfg(windows)'.dependencies]
