@@ -2,7 +2,7 @@
 
 [![Статус сборки](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml)
 
-Утилита предназначена для проверки доступности пиров и автоматического их обновления в конфигурационном файле Yggdrasil, а так же, с помощью метода admin API - addPeer.
+Утилита предназначена для проверки доступности пиров и автоматического их обновления в конфигурационном файле [Yggdrasil](https://yggdrasil-network.github.io/), а так же, с помощью метода admin API - addPeer.
 
 Настроив автоматический запуск утилиты по расписанию, можно забыть о том, что публичные пиры иногда перестают работать и нужно их обновлять вручную.
 
