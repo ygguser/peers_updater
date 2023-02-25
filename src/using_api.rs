@@ -1,6 +1,6 @@
 use crate::peer::Peer;
 use nu_json::Map;
-use std::net::{SocketAddr, TcpStream};
+use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 #[cfg(not(target_os = "windows"))]
 use std::os::unix::net::UnixStream;
 use std::time;
@@ -249,7 +249,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
         }
     } else {
         //tcp
-        let mut string_addr = string_addr.replace("tcp://", "").replace("\"", "");
+        let string_addr = string_addr.replace("\"", "");
         let uri = match uriparse::URI::try_from(string_addr.as_str()) {
             Ok(_u) => _u,
             Err(e) => {
@@ -266,14 +266,6 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
             }
         };
 
-        let ip_addr = match crate::resolve::resolve(&host.to_string()) {
-            Some(_a) => _a,
-            _ => {
-                eprintln!("Failed to resolve host from socket URI.");
-                return SockAddr::None;
-            }
-        };
-
         let port = match uri.port() {
             Some(_p) => _p,
             _ => {
@@ -282,16 +274,22 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
             }
         };
 
-        string_addr = format!("{}:{}", ip_addr, port);
-
-        let _socket_addr = match string_addr.as_str().parse::<SocketAddr>() {
-            Ok(_a) => {
-                return SockAddr::Tcp(_a);
-            }
-            _ => {
-                eprintln!("Unknown type of administrative socket address.");
+        let mut addrs_iter = match format!("{}:{}", host, port).to_socket_addrs() {
+            Ok(_a) => _a,
+            Err(e) => {
+                eprintln!("Unable to parse socket address ({}).", e);
                 return SockAddr::None;
             }
         };
+
+        let sock_addr = match addrs_iter.next() {
+            Some(_sa) => _sa,
+            _ => {
+                eprintln!("Unable to get socket address.");
+                return SockAddr::None;
+            }
+        };
+
+        return SockAddr::Tcp(sock_addr);
     }
 }

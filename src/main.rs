@@ -14,7 +14,6 @@ mod latency;
 mod parse_config;
 mod parsing_peers;
 mod peer;
-mod resolve;
 mod self_updating;
 mod tmpfile;
 mod unpack;

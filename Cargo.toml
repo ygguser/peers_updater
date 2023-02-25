@@ -15,7 +15,6 @@ clap = { version = "4.1.6", default-features = false, features = [
     "help",
     "std",
 ] }
-dns-lookup = "1.0.8"
 nu-json = { version = "0.75.0", default-features = false }
 regex = { version = "1.7.1", default-features = false, features = ["std"] }
 tempfile = "3.3.0"

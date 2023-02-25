@@ -1,22 +1,19 @@
 use crate::peer::Peer;
-use std::net::{SocketAddr, TcpStream};
+use std::net::{TcpStream, ToSocketAddrs};
 use std::time;
 
 pub fn set_latency(peer: &mut Peer) {
-    let ip_addr = match crate::resolve::resolve(&peer.addr) {
-        Some(_a) => _a,
+    let mut addrs_iter = match format!("{}:{}", peer.addr, peer.port).to_socket_addrs() {
+        Ok(_a) => _a,
         _ => {
             peer.is_alive = false;
             return;
         }
     };
-
-    let addr = match format!("{}:{}", ip_addr, peer.port)
-        .as_str()
-        .parse::<SocketAddr>()
-    {
-        Ok(_a) => _a,
+    let addr = match addrs_iter.next() {
+        Some(__sa) => __sa,
         _ => {
+            peer.is_alive = false;
             return;
         }
     };
