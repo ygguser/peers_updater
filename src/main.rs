@@ -15,7 +15,7 @@ mod parse_config;
 mod parsing_peers;
 mod peer;
 mod self_updating;
-mod tmpfile;
+mod tmpdir;
 mod unpack;
 mod using_api;
 
@@ -64,7 +64,7 @@ fn main() {
     }
 
     // Creating a temporary directory
-    let tmp_dir = match tmpfile::create_tmp_dir(None) {
+    let tmp_dir = match tmpdir::create_tmp_dir(None) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to create a temporary directory ({}).", e);

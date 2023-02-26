@@ -79,7 +79,7 @@ pub fn self_update() {
     println!("Downloading...");
 
     // Creating a temporary directory
-    let tmp_dir = match crate::tmpfile::create_tmp_dir(exe_path.parent()) {
+    let tmp_dir = match crate::tmpdir::create_tmp_dir(exe_path.parent()) {
         Ok(val) => val,
         Err(e) => {
             eprintln!("Failed to create a temporary directory ({}).", e);
