@@ -39,7 +39,7 @@ fn main() {
     }
 
     let conf_path = match matches.get_one::<PathBuf>("config") {
-        Some(_c) => _c,
+        Some(conf_path) => conf_path,
         _ => {
             eprintln!("Can't get the configuration file default path.");
             process::exit(1);
