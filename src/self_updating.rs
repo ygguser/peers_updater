@@ -19,7 +19,7 @@ pub fn self_update() {
     //Current version
     let current_version_str = env!("CARGO_PKG_VERSION");
     let mut version_vec: Vec<&str> = current_version_str.split('.').collect();
-    let mut major: u8 = version_vec.get(0).get_or_insert(&"0").parse().unwrap_or(0);
+    let mut major: u8 = version_vec.first().get_or_insert(&"0").parse().unwrap_or(0);
     let mut minor: u8 = version_vec.get(1).get_or_insert(&"0").parse().unwrap_or(0);
     let mut patch: u8 = version_vec.get(2).get_or_insert(&"0").parse().unwrap_or(0);
     let curr_version: Version = Version {
@@ -50,7 +50,7 @@ pub fn self_update() {
     };
 
     version_vec = latest_version_gh.tag_name.split('.').collect();
-    major = version_vec.get(0).get_or_insert(&"0").parse().unwrap_or(0);
+    major = version_vec.first().get_or_insert(&"0").parse().unwrap_or(0);
     minor = version_vec.get(1).get_or_insert(&"0").parse().unwrap_or(0);
     patch = version_vec.get(2).get_or_insert(&"0").parse().unwrap_or(0);
     let latest_version: Version = Version {
@@ -154,7 +154,7 @@ fn get_latest_version(
     };
 
     let tag_name = match obj.get("tag_name") {
-        Some(_a) => _a.to_string().replace("\"", ""),
+        Some(_a) => _a.to_string().replace('"', ""),
         _ => {
             eprintln!("Failed to get \"tag_name\" from API request result.");
             ::std::process::exit(1);
@@ -177,7 +177,7 @@ fn get_latest_version(
         }
     };
 
-    let url = match get_asset_url(&as_array, target) {
+    let url = match get_asset_url(as_array, target) {
         Some(_u) => _u,
         None => {
             eprintln!("No asset found for target: {}", target);
@@ -198,7 +198,7 @@ fn get_asset_url(as_array: &Vec<nu_json::Value>, target: &str) -> Option<String>
         };
 
         let as_url = match as_obj.get("browser_download_url") {
-            Some(_pu) => _pu.to_string().replace("\"", ""),
+            Some(_pu) => _pu.to_string().replace('"', ""),
             _ => {
                 continue;
             }

@@ -54,7 +54,7 @@ fn main() {
         }
 
         // Checking write access to the configuration file
-        if let Err(e) = check_permissions(&conf_path) {
+        if let Err(e) = check_permissions(conf_path) {
             eprintln!(
                 "There is no write access to the Yggdrasil configuration file ({}).",
                 e

@@ -17,7 +17,7 @@ pub fn add_peers_to_conf_new(
     let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
     let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
 
-    if !(peers_start_pos < peers_end_pos) {
+    if peers_start_pos >= peers_end_pos {
         eprintln!("Incorrect configuration file format. The file was not written to.");
         return;
     }
@@ -42,7 +42,7 @@ pub fn add_peers_to_conf_new(
 
     //Always in
     if let Some(always_in) = always_in_p {
-        let ai = always_in.split(" ");
+        let ai = always_in.split(' ');
         new_peers.push_str("\n\n    #extra");
         for ai_s in ai {
             new_peers.push_str(format!("\n    {}", ai_s).as_str());
@@ -53,7 +53,7 @@ pub fn add_peers_to_conf_new(
 
     char_vec.splice(peers_start_pos..peers_end_pos + 1, new_peers.chars());
 
-    if let Ok(mut f) = File::create(&conf_path) {
+    if let Ok(mut f) = File::create(conf_path) {
         if let Err(e) = f.write_all(char_vec.into_iter().collect::<String>().as_bytes()) {
             eprintln!(
                 "The changes could not be written to the configuration file ({}).",
@@ -94,6 +94,7 @@ fn find_peers_start_pos(chars: &Vec<char>, from: usize, to: usize) -> usize {
     cur_pos
 }
 
+#[allow(clippy::ptr_arg)]
 fn find_comment_end_and_continue(
     chars: &Vec<char>,
     symbols: &Vec<char>,

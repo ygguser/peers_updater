@@ -29,7 +29,7 @@ pub fn create_tmp_dir(
         ))
     };
 
-    if let Err(_) = std::fs::create_dir_all(&tmp_dir_path) {
+    if std::fs::create_dir_all(&tmp_dir_path).is_err() {
         eprintln!(
             "Failed to create a temporary directory ({}).",
             &tmp_dir_path.display()

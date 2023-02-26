@@ -66,7 +66,7 @@ pub fn update_peers(
 
     //Always in
     if let Some(always_in) = always_in_p {
-        let ai = always_in.split(" ");
+        let ai = always_in.split(' ');
         for ai_s in ai {
             response.clear();
             request(
@@ -123,7 +123,7 @@ fn remove_peer(peer_uri: &String, socket_addr: &SockAddr, resp: &mut String) {
             peer_uri
         )
         .as_str(),
-        &socket_addr,
+        socket_addr,
         resp,
     );
 }
@@ -180,7 +180,7 @@ fn remove_peers(getpeers_resp: &mut String, socket_addr: &SockAddr) {
         };
 
         let peer_uri = match peer_obj.get("remote") {
-            Some(_pu) => _pu.to_string().replace("\"", ""),
+            Some(_pu) => _pu.to_string().replace('"', ""),
             _ => {
                 //eprintln!("Couldn't get peer uri.");
                 continue;
@@ -195,29 +195,34 @@ fn remove_peers(getpeers_resp: &mut String, socket_addr: &SockAddr) {
 fn get_connection(sock_addr: &SockAddr) -> Connection {
     match sock_addr {
         SockAddr::Tcp(_sa) => {
-            let _ = match TcpStream::connect_timeout(&_sa, time::Duration::from_secs(10)) {
+            match TcpStream::connect_timeout(_sa, time::Duration::from_secs(10)) {
                 Ok(_s) => {
+                    #[allow(clippy::needless_return)]
                     return Connection::Tcp(_s);
                 }
                 Err(e) => {
                     eprintln!("Failed to connect via TCP stream ({}).", e);
+                    #[allow(clippy::needless_return)]
                     return Connection::None;
                 }
             };
         }
         #[cfg(not(target_os = "windows"))]
         SockAddr::Unix(_sa) => {
-            let _ = match UnixStream::connect(_sa) {
+            match UnixStream::connect(_sa) {
                 Ok(_s) => {
+                    #[allow(clippy::needless_return)]
                     return Connection::Unix(_s);
                 }
                 Err(e) => {
                     eprintln!("Failed to connect via unix domain socket ({}).", e);
+                    #[allow(clippy::needless_return)]
                     return Connection::None;
                 }
             };
         }
         SockAddr::None => {
+            #[allow(clippy::needless_return)]
             return Connection::None;
         }
     };
@@ -227,7 +232,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     //Extract value from conf_obj
     let mut _t_sa: String;
     let string_addr = if let Some(_string_addr) = conf_obj.get("AdminListen") {
-        _t_sa = format!("{}", _string_addr).replace("\"", "");
+        _t_sa = format!("{}", _string_addr).replace('"', "");
 
         _t_sa
     } else {
@@ -237,15 +242,11 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     if string_addr.contains("unix://") {
         //unix domain socket
         #[cfg(not(target_os = "windows"))]
-        return SockAddr::Unix(
-            string_addr
-                .replace("\"", "")
-                .replace("unix://", "")
-                .to_string(),
-        );
+        return SockAddr::Unix(string_addr.replace('"', "").replace("unix://", ""));
         #[allow(unreachable_code)]
         {
             eprintln!("It is not possible to use a unix socket in Windows.");
+            #[allow(clippy::needless_return)]
             return SockAddr::None;
         }
     } else {
@@ -305,7 +306,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
             }
         };
 
-        return SockAddr::Tcp(sock_addr);
+        SockAddr::Tcp(sock_addr)
     }
 }
 

@@ -14,7 +14,7 @@ struct PPFile {
 
 fn collect_files(
     dir: &std::path::PathBuf,
-    mut file_patches: &mut Vec<PPFile>,
+    file_patches: &mut Vec<PPFile>,
     ignored_countries: &Vec<&str>,
 ) -> Result<(), Box<dyn std::error::Error>> {
     for entry in std::fs::read_dir(dir)? {
@@ -47,11 +47,9 @@ fn collect_files(
                 country,
                 region,
             });
-        } else {
-            if let Err(e) = collect_files(&path, &mut file_patches, ignored_countries) {
-                eprintln!("Failed to collect *.md files ({}).", e);
-                process::exit(1);
-            }
+        } else if let Err(e) = collect_files(&path, file_patches, ignored_countries) {
+            eprintln!("Failed to collect *.md files ({}).", e);
+            process::exit(1);
         }
     }
 
@@ -76,7 +74,7 @@ pub fn collect_peers(
     let ignored_countries: &Vec<&str> = &(ignored_countries_str.split(' ').collect());
 
     let mut pp_files: Vec<PPFile> = Default::default();
-    if let Err(e) = collect_files(&path, &mut pp_files, ignored_countries) {
+    if let Err(e) = collect_files(path, &mut pp_files, ignored_countries) {
         eprintln!("Failed to collect *.md files ({}).", e);
         process::exit(1);
     }
@@ -84,42 +82,40 @@ pub fn collect_peers(
     for pp_file in pp_files {
         // Reading a file
         if let Ok(lines) = read_lines(pp_file.path) {
-            for line in lines {
-                if let Ok(str) = line {
-                    for peer_ in re.captures_iter(str.as_str()) {
-                        let uri = match peer_.get(0) {
-                            Some(_u) => _u.as_str().to_string(),
-                            None => {
-                                continue;
-                            }
-                        };
-                        let mut skip = false;
-                        for ig in ignored_peers.into_iter() {
-                            if (!ig.is_empty()) && uri.contains(ig.replace("\"", "").as_str()) {
-                                skip = true;
-                                break;
-                            }
-                        }
-                        if skip {
+            for line in lines.into_iter().flatten() {
+                for peer_ in re.captures_iter(line.as_str()) {
+                    let uri = match peer_.get(0) {
+                        Some(_u) => _u.as_str().to_string(),
+                        None => {
                             continue;
                         }
-                        v.push(Peer::new(
-                            uri,
-                            peer_
-                                .get(2)
-                                .map_or("".to_string(), |m| m.as_str().to_string()),
-                            peer_
-                                .get(3)
-                                .map_or("".to_string(), |m| m.as_str().to_string()),
-                            // peer_
-                            //     .get(1)
-                            //     .map_or("".to_string(), |m| m.as_str().to_string()),
-                            pp_file.region.to_owned(),
-                            pp_file.country.to_owned(),
-                            false,
-                            99999,
-                        ));
+                    };
+                    let mut skip = false;
+                    for ig in ignored_peers.iter() {
+                        if (!ig.is_empty()) && uri.contains(ig.replace('"', "").as_str()) {
+                            skip = true;
+                            break;
+                        }
                     }
+                    if skip {
+                        continue;
+                    }
+                    v.push(Peer::new(
+                        uri,
+                        peer_
+                            .get(2)
+                            .map_or("".to_string(), |m| m.as_str().to_string()),
+                        peer_
+                            .get(3)
+                            .map_or("".to_string(), |m| m.as_str().to_string()),
+                        // peer_
+                        //     .get(1)
+                        //     .map_or("".to_string(), |m| m.as_str().to_string()),
+                        pp_file.region.to_owned(),
+                        pp_file.country.to_owned(),
+                        false,
+                        99999,
+                    ));
                 }
             }
         }

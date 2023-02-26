@@ -1,7 +1,7 @@
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 
-pub fn unpack_archive(tmp_dir: &PathBuf, fname: &str) -> std::io::Result<bool> {
+pub fn unpack_archive(tmp_dir: &Path, fname: &str) -> std::io::Result<bool> {
     let file = fs::File::open(format!("{}/{}", tmp_dir.display(), fname))?;
     let mut archive = zip::ZipArchive::new(file)?;
 
@@ -18,10 +18,10 @@ pub fn unpack_archive(tmp_dir: &PathBuf, fname: &str) -> std::io::Result<bool> {
         } else {
             if let Some(p) = out_path.parent() {
                 if !p.exists() {
-                    fs::create_dir_all(&p)?;
+                    fs::create_dir_all(p)?;
                 }
             }
-            let mut outfile = fs::File::create(&out_path)?;
+            let mut outfile = fs::File::create(out_path)?;
             std::io::copy(&mut file, &mut outfile)?;
         }
 
@@ -29,7 +29,7 @@ pub fn unpack_archive(tmp_dir: &PathBuf, fname: &str) -> std::io::Result<bool> {
         {
             use std::os::unix::fs::PermissionsExt;
             if let Some(mode) = file.unix_mode() {
-                fs::set_permissions(&out_path, fs::Permissions::from_mode(mode))?;
+                fs::set_permissions(out_path, fs::Permissions::from_mode(mode))?;
             }
         }
     }
