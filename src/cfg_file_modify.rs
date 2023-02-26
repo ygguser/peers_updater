@@ -154,3 +154,183 @@ fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usiz
 
     cur_pos
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_find_peers_section_1() {
+        let cfg_txt = "{
+            #commets
+            Peers: [
+                tcp://some.peer.uri:34589
+                ]
+            }";
+
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "Peers: [
+                tcp://some.peer.uri:34589
+                ]"
+        );
+    }
+
+    #[test]
+    fn test_find_peers_section_2() {
+        let cfg_txt = "{
+            #comments
+            Peers:
+            [
+              tcp://some.peer.uri:34589
+            ]
+          }";
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "Peers:
+            [
+              tcp://some.peer.uri:34589
+            ]"
+        );
+    }
+
+    #[test]
+    fn test_find_peers_section_3() {
+        let cfg_txt = "{
+            #comments
+            #Peers:
+            #[
+            #  tcp://some.peer.uri:34589
+            #]
+            Peers: [
+                tcp://another.peer.uri:55555
+            ]
+          }";
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "Peers: [
+                tcp://another.peer.uri:55555
+            ]"
+        );
+    }
+
+    #[test]
+    fn test_find_peers_section_4() {
+        let cfg_txt = "{
+            #comments
+            #Peers:
+            #[
+            #  tcp://some.peer.uri:34589
+            #]
+            /* comment */
+            Peers: [
+                tcp://another.peer.uri:55555 //comment
+            ]
+          }";
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "Peers: [
+                tcp://another.peer.uri:55555 //comment
+            ]"
+        );
+    }
+
+    #[test]
+    fn test_find_peers_section_5() {
+        let cfg_txt = "{
+            #commets
+            #Peers:
+            #[
+            #  tcp://some.peer.uri:34589
+            #]
+            /* comment */
+            Peers: [
+                tcp://another.peer.uri:55555 #comment
+            ]
+            //Peers:
+            //[
+            //  tcp://some.new.peer.uri:34343
+            //]
+            /* asd */
+          }";
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "Peers: [
+                tcp://another.peer.uri:55555 #comment
+            ]"
+        );
+    }
+
+    #[test]
+    fn test_find_peers_section_6() {
+        let cfg_txt = "{
+            \"Peers\": [
+                \"tcp://json.formatted.cfg:5565\",
+                \"tcp://102.223.180.74:993\",
+                \"tcp://yggno.de:18226\"
+                ]             
+          }";
+        let char_vec: Vec<char> = cfg_txt.chars().collect();
+        let vec_len = char_vec.len();
+
+        let peers_start_pos = find_peers_start_pos(&char_vec, 1, vec_len);
+        let peers_end_pos = find_end_of_peers_fragment(&char_vec, peers_start_pos + 6, vec_len);
+        println!("start: {}", peers_start_pos);
+        println!("end: {}", peers_end_pos);
+        assert_eq!(
+            char_vec[peers_start_pos..peers_end_pos + 1]
+                .into_iter()
+                .collect::<String>(),
+            "\"Peers\": [
+                \"tcp://json.formatted.cfg:5565\",
+                \"tcp://102.223.180.74:993\",
+                \"tcp://yggno.de:18226\"
+                ]"
+        );
+    }
+}

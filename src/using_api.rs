@@ -5,6 +5,7 @@ use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 use std::os::unix::net::UnixStream;
 use std::time;
 
+#[derive(Debug, PartialEq)]
 enum SockAddr {
     Tcp(SocketAddr),
     #[cfg(not(target_os = "windows"))]
@@ -305,5 +306,58 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
         };
 
         return SockAddr::Tcp(sock_addr);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_socket_addr_unix() {
+        let admin_listen_param = "{
+            AdminListen: unix:///var/run/yggdrasil.sock
+        }";
+        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        #[cfg(not(target_os = "windows"))]
+        assert_eq!(
+            get_socket_addr(&mut hjson_obj),
+            SockAddr::Unix("/var/run/yggdrasil.sock".to_string())
+        );
+        #[cfg(target_os = "windows")]
+        assert_eq!(get_socket_addr(&mut hjson_obj), SockAddr::None);
+    }
+
+    #[test]
+    fn test_get_socket_addr_ip() {
+        let admin_listen_param = "{
+            AdminListen: tcp://127.0.0.1:9002
+        }";
+        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        assert_eq!(
+            get_socket_addr(&mut hjson_obj),
+            SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
+        );
+    }
+
+    #[test]
+    fn test_get_socket_addr_domain_name() {
+        let admin_listen_param = "{
+            AdminListen: tcp://localhost:9002
+        }";
+        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        assert_eq!(
+            get_socket_addr(&mut hjson_obj),
+            SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
+        );
+    }
+
+    #[test]
+    fn test_get_socket_addr_domain_name_port_is_missing() {
+        let admin_listen_param = "{
+            AdminListen: tcp://localhost
+        }";
+        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        assert_eq!(get_socket_addr(&mut hjson_obj), SockAddr::None);
     }
 }
