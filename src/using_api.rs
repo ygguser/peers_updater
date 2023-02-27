@@ -348,10 +348,11 @@ mod tests {
             AdminListen: tcp://localhost:9002
         }";
         let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
-        assert_eq!(
-            get_socket_addr(&mut hjson_obj),
-            SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
-        );
+        let res = get_socket_addr(&mut hjson_obj)
+            == SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
+            || get_socket_addr(&mut hjson_obj)
+                == SockAddr::Tcp("[::1]:9002".to_socket_addrs().unwrap().next().unwrap());
+        assert_eq!(true, res);
     }
 
     #[test]
