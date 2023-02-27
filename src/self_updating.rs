@@ -142,10 +142,15 @@ pub fn self_update() {
 fn get_latest_version(
     target: &str,
 ) -> std::result::Result<GitHubVersion, Box<dyn std::error::Error>> {
-    let resp = attohttpc::get("https://api.github.com/repos/ygguser/peers_updater/releases/latest")
-        .send()?;
+    let response =
+        tinyget::get("https://api.github.com/repos/ygguser/peers_updater/releases/latest")
+            .with_header(
+                "User-Agent",
+                "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0",
+            )
+            .send()?;
 
-    let obj: nu_json::Map<String, nu_json::Value> = match nu_json::from_str(&resp.text()?) {
+    let obj: nu_json::Map<String, nu_json::Value> = match nu_json::from_str(response.as_str()?) {
         Ok(_o) => _o,
         Err(e) => {
             eprintln!("Error converting a json string to an object ({}).", e);
