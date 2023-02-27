@@ -6,12 +6,11 @@ use std::io;
 use std::path::PathBuf;
 use std::process;
 
-mod cfg_file_modify;
+mod cfg_file_read_write;
 mod clap_args;
 mod defaults;
 mod download_file;
 mod latency;
-mod parse_config;
 mod parsing_peers;
 mod peer;
 mod self_updating;
@@ -171,7 +170,7 @@ fn main() {
             };
 
             //Reading the configuration file
-            let cfg_txt = match parse_config::read_config(conf_path) {
+            let cfg_txt = match cfg_file_read_write::read_config(conf_path) {
                 Ok(_ct) => _ct,
                 Err(e) => {
                     eprintln!("The configuration file cannot be read ({}).", e);
@@ -183,7 +182,7 @@ fn main() {
 
             // Adding peers to the configuration file
             if update_cfg {
-                cfg_file_modify::add_peers_to_conf_new(
+                cfg_file_read_write::add_peers_to_conf_new(
                     &peers,
                     conf_path,
                     n_peers,
@@ -216,14 +215,13 @@ fn main() {
             // Adding peers during execution
             if use_api {
                 //Parsing the configuration file
-                let mut conf_obj: Map<String, nu_json::Value> =
-                    match parse_config::get_hjson_obj(&cfg_txt) {
-                        Ok(co) => co,
-                        Err(e) => {
-                            eprintln!("Can't parse the config file ({})!", e);
-                            process::exit(1);
-                        }
-                    };
+                let mut conf_obj: Map<String, nu_json::Value> = match nu_json::from_str(&cfg_txt) {
+                    Ok(co) => co,
+                    Err(e) => {
+                        eprintln!("Can't parse the config file ({})!", e);
+                        process::exit(1);
+                    }
+                };
 
                 using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers);
             }

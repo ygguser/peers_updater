@@ -130,7 +130,8 @@ fn remove_peer(peer_uri: &String, socket_addr: &SockAddr, resp: &mut String) {
 
 fn remove_peers(getpeers_resp: &mut String, socket_addr: &SockAddr) {
     //parse to obj
-    //Serde deserialization is not used in order to get smaller binary files.
+    //Serde deserialization is not used in order to get smaller binary files
+    //(there is no need to describe the structures of the json objects used in our case).
 
     let connected_peers: Map<String, nu_json::Value> = match nu_json::from_str(getpeers_resp) {
         Ok(cp) => cp,
@@ -319,7 +320,7 @@ mod tests {
         let admin_listen_param = "{
             AdminListen: unix:///var/run/yggdrasil.sock
         }";
-        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
         #[cfg(not(target_os = "windows"))]
         assert_eq!(
             get_socket_addr(&mut hjson_obj),
@@ -334,7 +335,7 @@ mod tests {
         let admin_listen_param = "{
             AdminListen: tcp://127.0.0.1:9002
         }";
-        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
         assert_eq!(
             get_socket_addr(&mut hjson_obj),
             SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
@@ -346,7 +347,7 @@ mod tests {
         let admin_listen_param = "{
             AdminListen: tcp://localhost:9002
         }";
-        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
         assert_eq!(
             get_socket_addr(&mut hjson_obj),
             SockAddr::Tcp("127.0.0.1:9002".to_socket_addrs().unwrap().next().unwrap())
@@ -358,7 +359,7 @@ mod tests {
         let admin_listen_param = "{
             AdminListen: tcp://localhost
         }";
-        let mut hjson_obj = crate::parse_config::get_hjson_obj(admin_listen_param).unwrap();
+        let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
         assert_eq!(get_socket_addr(&mut hjson_obj), SockAddr::None);
     }
 }
