@@ -20,6 +20,11 @@ regex = { version = "1.7.1", default-features = false, features = ["std"] }
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 tinyget = { version = "1.0.1", default-features = false, features = ["https"] }
 
+[target.arm-unknown-linux-gnueabi.dependencies]
+openssl = { version = "0.10.45", default-features = false, features = [
+    "vendored",
+] }
+
 [profile.release]
 strip = true
 opt-level = "z"
