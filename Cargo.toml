@@ -15,7 +15,7 @@ clap = { version = "4.1.6", default-features = false, features = [
     "help",
     "std",
 ] }
-nu-json = { version = "0.76.0", default-features = false }
+nu-json = { version = "0.76.0", default-features = false, optional = true }
 regex = { version = "1.7.1", default-features = false, features = ["std"] }
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
 tinyget = { version = "1.0.1", default-features = false, features = ["https"] }
@@ -26,3 +26,9 @@ opt-level = "z"
 lto = true
 codegen-units = 1
 panic = "abort"
+
+[features]
+default = ["updating_cfg", "using_api", "self_updating"]
+updating_cfg = []
+using_api = ["dep:nu-json"]
+self_updating = ["dep:nu-json"]

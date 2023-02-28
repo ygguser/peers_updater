@@ -1,11 +1,14 @@
+#[cfg(feature = "updating_cfg")]
 use crate::peer::Peer;
-use std::fs::File;
-use std::io;
-use std::io::prelude::Read;
+
+#[cfg(feature = "updating_cfg")]
 use std::io::Write;
+
+use std::fs::File;
+use std::io::prelude::Read;
 use std::path::PathBuf;
 
-pub fn read_config(path: &PathBuf) -> io::Result<String> {
+pub fn read_config(path: &PathBuf) -> std::io::Result<String> {
     let mut f = File::open(path)?;
     let mut buffer = String::new();
     f.read_to_string(&mut buffer)?;
@@ -15,6 +18,7 @@ pub fn read_config(path: &PathBuf) -> io::Result<String> {
     //Ok(format!("{}", buffer))
 }
 
+#[cfg(feature = "updating_cfg")]
 pub fn add_peers_to_conf_new(
     peers: &Vec<Peer>,
     conf_path: &PathBuf,
@@ -77,6 +81,7 @@ pub fn add_peers_to_conf_new(
     }
 }
 
+#[cfg(feature = "updating_cfg")]
 fn find_peers_start_pos(chars: &Vec<char>, from: usize, to: usize) -> usize {
     let mut cur_pos = from;
 
@@ -107,6 +112,7 @@ fn find_peers_start_pos(chars: &Vec<char>, from: usize, to: usize) -> usize {
 }
 
 #[allow(clippy::ptr_arg)]
+#[cfg(feature = "updating_cfg")]
 fn find_comment_end_and_continue(
     chars: &Vec<char>,
     symbols: &Vec<char>,
@@ -132,6 +138,7 @@ fn find_comment_end_and_continue(
     cur_pos
 }
 
+#[cfg(feature = "updating_cfg")]
 fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usize {
     let mut cur_pos = from;
 
