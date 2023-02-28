@@ -30,11 +30,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added the ability to simply disable some functionality during assembly. For more information, see [README.md](README.md#build-from-source)
+- Added the ability to simply disable some functionality during assembly. For more information, see [README.md](README.md#configuring-functionality-during-assembly)
 
 ### Changed
 
 - The number of dependencies has been reduced and some of them have been replaced with "lighter" alternatives. As a result, smaller binaries are obtained.
+- Added a couple of notes about the [build](README.md#build-from-source) from source
 
 ## [0.2.0] - 2023-02-23
 
