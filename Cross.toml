@@ -37,7 +37,7 @@ pre-build = [
 [target.armv7-unknown-linux-gnueabihf]
 pre-build = [
     "dpkg --add-architecture $CROSS_DEB_ARCH",
-    "apt-get update && apt-get --assume-yes install libssl-dev:$CROSS_DEB_ARCH",
+    "apt-get update && apt-get --assume-yes install libssl-dev:$CROSS_DEB_ARCH gcc-arm-linux-gnueabihf",
 ]
 
 # [target.arm-unknown-linux-gnueabi]
