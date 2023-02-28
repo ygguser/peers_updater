@@ -30,7 +30,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added the ability to simply disable some functionality during assembly. For more information, see [README.md](README.md#configuring-functionality-during-assembly)
+- Added the ability to simply disable some functionality during assembly. For more information, see [README.md](README.md#build-from-source) 
 
 ### Changed
 
