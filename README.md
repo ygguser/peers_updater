@@ -96,7 +96,9 @@ cd peers_updater
 cargo build --release
 ```
 
-##### Assembly Features
+<details><summary>Assembly features</summary>
+
+##### Configuring functionality during assembly
 
 By default, the project will assemble with all the functionality described above, but it is possible to disable the functions you do not need and thereby slightly reduce the size of the executable file.
 
@@ -124,15 +126,4 @@ Options:
   -h, --help                    Print help
   -V, --version                 Print version
 ```
-
-<details><summary>Comparison of binary file sizes depending on the selected options:</summary>
-
-| Command | Result |
-|---|---|
-| cargo build --release  | 1039K |
-| cargo build --release --no-default-features | 899K |
-| cargo build --release --no-default-features --features "updating_cfg" | 951K |
-| cargo build --release --no-default-features --features "using_api" | 1023K |
-| cargo build --release --no-default-features --features "self_updating" | 975K |
-
-The builds in the [releases](https://github.com/ygguser/peers_updater/releases) are smaller, because they were assembled with additional optimizations.</details>
+</details>

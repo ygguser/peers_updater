@@ -96,7 +96,9 @@ cd peers_updater
 cargo build --release
 ```
 
-##### Особенности сборки
+<details><summary>Дополнительные возможности</summary>
+
+##### Настройка функционала при сборке
 
 По-умолчанию, проект соберется со всем описанным выше функционалом, однако есть возможность отключить ненужные вам функции и тем самым немного снизить размер исполняемого файла.
 
@@ -124,15 +126,4 @@ Options:
   -h, --help                    Print help
   -V, --version                 Print version
 ```
-
-<details><summary>Сравнение размеров бинарных файлов в зависимости от выбранных опций</summary>
-
-| Команда | Результат |
-|---|---|
-| cargo build --release  | 1039K |
-| cargo build --release --no-default-features | 899K |
-| cargo build --release --no-default-features --features "updating_cfg" | 951K |
-| cargo build --release --no-default-features --features "using_api" | 1023K |
-| cargo build --release --no-default-features --features "self_updating" | 975K |
-
-Сборки в [релизах](https://github.com/ygguser/peers_updater/releases) имеют меньшие размеры, т.к. они собирались с дополнительной оптимизаций.</details>
+</details>
