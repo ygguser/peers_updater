@@ -87,8 +87,43 @@ Now the peer nodes will be updated on Sundays at 0 o'clock.
 #### Build from source
 
 The project is being built without errors and warnings with cargo 1.65.0 and rustc 1.65.0.
+
+Just install rust, `git`, `libssl-dev` (or `openssl-devel` on fedora) \[ may also be needed `gcc-multilib` \] and do the following: 
+
 ```
 git clone https://github.com/ygguser/peers_updater
 cd peers_updater
 cargo build --release
 ```
+
+<details><summary>Assembly features</summary>
+
+##### Configuring functionality during assembly
+
+By default, the project will assemble with all the functionality described above, but it is possible to disable the functions you do not need and thereby slightly reduce the size of the executable file.
+
+For example:
+
+```
+cargo build --release --no-default-features --features "base update_cfg using_api"
+```
+
+Possible values of the features parameter:
+
+- `updating_cfg` - updating the Yggdrasil configuration file
+- `using_api` - using the API to update peers
+- `self_updating` - possibility of self-updating
+
+This is how the options help for a program compiled with the `--no-default-features` option looks like:
+
+```
+Usage: peers_updater [OPTIONS]
+
+Options:
+  -p, --print                   Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
+  -i, --ignore <VALUE>          A space-separated string of characters. Peers whose URIs contain combinations of this characters will not be added to the configuration
+  -I, --ignore_country <VALUE>  A space-separated string containing the names of countries that will not be added to the configuration
+  -h, --help                    Print help
+  -V, --version                 Print version
+```
+</details>

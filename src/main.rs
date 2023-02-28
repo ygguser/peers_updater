@@ -1,42 +1,67 @@
 use crate::peer::Peer;
-use nu_json::Map;
-use std::fs;
 
-use std::io;
+#[cfg(feature = "using_api")]
+use nu_json::Map;
+
+use std::fs;
 use std::path::PathBuf;
 use std::process;
 
+#[cfg(any(feature = "updating_cfg", feature = "using_api"))]
 mod cfg_file_read_write;
-mod clap_args;
+
+#[cfg(any(
+    feature = "updating_cfg",
+    feature = "using_api",
+    feature = "self_updating"
+))]
 mod defaults;
+
+#[cfg(feature = "using_api")]
+mod using_api;
+
+#[cfg(feature = "self_updating")]
+mod self_updating;
+
+mod clap_args;
 mod download_file;
 mod latency;
 mod parsing_peers;
 mod peer;
-mod self_updating;
 mod tmpdir;
 mod unpack;
-mod using_api;
 
 fn main() {
     let matches = clap_args::build_args();
 
+    #[cfg(feature = "self_updating")]
     if matches.get_flag("self_update") {
         self_updating::self_update();
         process::exit(0);
     }
 
     let print_only = matches.get_flag("print");
-    let update_cfg = matches.get_flag("update_cfg");
-    let use_api = matches.get_flag("api");
+
+    let update_cfg = if cfg!(feature = "updating_cfg") {
+        matches.get_flag("update_cfg")
+    } else {
+        false
+    };
+
+    let use_api = if cfg!(feature = "using_api") {
+        matches.get_flag("api")
+    } else {
+        false
+    };
 
     if !(print_only || update_cfg || use_api) {
-        println!("Parameters expected: '-p' or '-u' and (or) '-a'.");
+        println!("At least the `-p` option is expected.");
         println!("For more information try '-h'.");
         println!("Nothing to do, exit.");
         process::exit(0);
     }
 
+    #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
     let conf_path = match matches.get_one::<PathBuf>("config") {
         Some(conf_path) => conf_path,
         _ => {
@@ -45,6 +70,7 @@ fn main() {
         }
     };
 
+    #[cfg(feature = "updating_cfg")]
     if update_cfg {
         // Checking if the file exists
         if !conf_path.exists() {
@@ -157,6 +183,7 @@ fn main() {
         }
         process::exit(0);
     } else if update_cfg || use_api {
+        #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
         if let Some(number) = matches.get_one::<String>("number") {
             let n_peers: u8 = match number.parse() {
                 Ok(_n) => _n,
@@ -181,6 +208,7 @@ fn main() {
             let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
 
             // Adding peers to the configuration file
+            #[cfg(feature = "updating_cfg")]
             if update_cfg {
                 cfg_file_read_write::add_peers_to_conf_new(
                     &peers,
@@ -213,6 +241,7 @@ fn main() {
             }
 
             // Adding peers during execution
+            #[cfg(feature = "using_api")]
             if use_api {
                 //Parsing the configuration file
                 let mut conf_obj: Map<String, nu_json::Value> = match nu_json::from_str(&cfg_txt) {
@@ -229,7 +258,8 @@ fn main() {
     }
 }
 
-fn check_permissions(path: &PathBuf) -> io::Result<bool> {
+#[cfg(feature = "updating_cfg")]
+fn check_permissions(path: &PathBuf) -> std::io::Result<bool> {
     let md = fs::metadata(path)?;
     let permissions = md.permissions();
     Ok(permissions.readonly())

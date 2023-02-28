@@ -26,6 +26,16 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - in case of vulnerabilities.
 -->
 
+## [0.3.0] - 2023-02-28
+
+### Added
+
+- Added the ability to simply disable some functionality during assembly. For more information, see [README.md](README.md#build-from-source)
+
+### Changed
+
+- The number of dependencies has been reduced and some of them have been replaced with "lighter" alternatives. As a result, smaller binaries are obtained.
+
 ## [0.2.0] - 2023-02-23
 
 ### Added
