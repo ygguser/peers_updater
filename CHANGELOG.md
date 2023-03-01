@@ -26,6 +26,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - in case of vulnerabilities.
 -->
 
+## [0.3.1] - 2023-03-01
+
+### Fixed
+
+- Error while loading shared libraries (libssl.so) (#10).
+
 ## [0.3.0] - 2023-03-01
 
 ### Added

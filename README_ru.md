@@ -88,7 +88,7 @@ sudo crontab -e
 
 Проект собирается без ошибок и предупреждений с cargo 1.65.0 и rustc 1.65.0.
 
-Просто установите rust, `git` (+ для Linux `libssl-dev` (или `openssl-devel` на fedora) \[ возможно понадобится `gcc-multilib` \]) и выполните следующее:
+Просто установите rust, `git` (для Linux возможно понадобится `gcc-multilib`) и выполните следующее:
 
 ```
 git clone https://github.com/ygguser/peers_updater

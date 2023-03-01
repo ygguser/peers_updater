@@ -1,6 +1,6 @@
 [package]
 name = "peers_updater"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 authors = ["YggUser (https://matrix.to/#/@ygguser:matrix.org)"]
 readme = "README.md"
@@ -18,12 +18,14 @@ clap = { version = "4.1.6", default-features = false, features = [
 nu-json = { version = "0.76.0", default-features = false, optional = true }
 regex = { version = "1.7.1", default-features = false, features = ["std"] }
 zip = { version = "0.6.3", default-features = false, features = ["deflate"] }
-tinyget = { version = "1.0.1", default-features = false, features = ["https"] }
 
-[target.arm-unknown-linux-gnueabi.dependencies]
-openssl = { version = "0.10.45", default-features = false, features = [
-    "vendored",
+[target.'cfg(windows)'.dependencies]
+minreq = { version = "2.6.0", default-features = false, features = [
+    "https-native",
 ] }
+
+[target.'cfg(unix)'.dependencies]
+minreq = { version = "2.6.0", default-features = false, features = ["https"] }
 
 [profile.release]
 strip = true
