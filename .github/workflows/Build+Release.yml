@@ -80,8 +80,11 @@ jobs:
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-aarch64-linux-gnu
           cargo install cross
           rustup update
-          rustup toolchain install nightly
-          rustup component add rust-src --toolchain nightly  
+          # rustup toolchain install nightly
+          # rustup component add rust-src --toolchain nightly
+          rustup toolchain install nightly-2023-02-15-x86_64-unknown-linux-gnu
+          rustup component add rust-src --toolchain nightly-2023-02-15-x86_64-unknown-linux-gnu
+          mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu  
           
       - name: Build and compress binaries
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
