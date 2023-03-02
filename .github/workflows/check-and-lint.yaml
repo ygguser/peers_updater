@@ -76,6 +76,15 @@ jobs:
           command: fmt
           args: --all -- --check
 
+  Typos:
+    name: Spell Check with Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v3
+      - name: Check spelling
+        uses: crate-ci/typos@master
+
   clippy:
     name: Clippy
     runs-on: ubuntu-latest
