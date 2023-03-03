@@ -1,6 +1,8 @@
 ### Yggrasil network peers checker / updater
 
-[![Build status](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml)
+[![Build status](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml) 
+[![GitHub contributors](https://img.shields.io/github/contributors/ygguser/peers_updater)](https://github.com/ygguser/peers_updater/graphs/contributors)
+[![License: MIT](https://img.shields.io/github/license/ygguser/peers_updater)](/LICENSE)
 
 The utility is designed to check the availability of peers and automatically update them in the [Yggdrasil](https://yggdrasil-network.github.io/) configuration file, as well as using the admin API - addPeer method.
 

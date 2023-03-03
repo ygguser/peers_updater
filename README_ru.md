@@ -1,6 +1,8 @@
 ### Yggrasil network peers checker / updater
 
-[![Статус сборки](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml)
+[![Статус сборки](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml/badge.svg)](https://github.com/ygguser/peers_updater/actions/workflows/Build+Release.yml) 
+[![Участники](https://img.shields.io/github/contributors/ygguser/peers_updater?label=%D0%A3%D1%87%D0%B0%D1%81%D1%82%D0%BD%D0%B8%D0%BA%D0%B8)](https://github.com/ygguser/peers_updater/graphs/contributors)
+[![Лицензия: MIT](https://img.shields.io/github/license/ygguser/peers_updater?label=%D0%9B%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F)](/LICENSE)
 
 Утилита предназначена для проверки доступности пиров и автоматического их обновления в конфигурационном файле [Yggdrasil](https://yggdrasil-network.github.io/), а так же, с помощью метода admin API - addPeer.
 
