@@ -107,7 +107,7 @@ cargo build --release
 Пример: 
 
 ```
-cargo build --release --no-default-features --features "base update_cfg using_api"
+cargo build --release --no-default-features --features "update_cfg self_updating"
 ```
 
 Возможные значения параметра features:

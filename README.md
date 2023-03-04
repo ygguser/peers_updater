@@ -107,7 +107,7 @@ By default, the project will assemble with all the functionality described above
 For example:
 
 ```
-cargo build --release --no-default-features --features "base update_cfg using_api"
+cargo build --release --no-default-features --features "update_cfg self_updating"
 ```
 
 Possible values of the features parameter:
