@@ -25,6 +25,12 @@ pub fn build_args() -> clap::ArgMatches {
             -p --print "Print the peers sorted by latency. When using this parameter, all other parameters will be ignored."
         )
         .required(false)
+    )
+    .arg(
+        arg!(
+            -j --json "Can be used with the `-p` (`--print`) option to print data in json format."
+        ).
+        required(false).requires("print")
     );
 
     #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
@@ -53,7 +59,7 @@ pub fn build_args() -> clap::ArgMatches {
             arg!(
                 -r --restart "Restart the Yggdrasil (systemd or windows) service"
             )
-            .required(false)
+            .required(false).requires("update_cfg")
         );
     }
 

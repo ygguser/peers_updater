@@ -2,7 +2,7 @@ use std::net::{TcpStream, ToSocketAddrs};
 use std::string::String;
 use std::time;
 
-//#[derive(Debug)]
+#[derive(Debug)]
 pub struct Peer {
     pub uri: String,
     pub addr: String,

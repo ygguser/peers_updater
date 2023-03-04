@@ -166,20 +166,7 @@ fn main() {
 
     // Printing data
     if print_only {
-        println!(
-            "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
-            "URI", "Region", "Country", "Latency"
-        );
-        println!("{0:-<100}", "-");
-        for peer in peers {
-            if !peer.is_alive {
-                break;
-            }
-            println!(
-                "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
-                peer.uri, peer.region, peer.country, peer.latency
-            );
-        }
+        print_peers(&peers, matches.get_flag("json"));
         process::exit(0);
     } else if update_cfg || use_api {
         #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
@@ -262,4 +249,42 @@ fn check_permissions(path: &PathBuf) -> std::io::Result<bool> {
     let md = fs::metadata(path)?;
     let permissions = md.permissions();
     Ok(permissions.readonly())
+}
+
+fn print_peers(peers: &Vec<Peer>, json: bool) {
+    if json {
+        //I don't want to add extra crates for deserialization.
+        //I want the size of the binary to be as small as possible.
+        //Therefore, there is no deserialization here, but just printing with formatting.
+        println!("{{");
+        println!("\t\"peers\": [");
+        let mut it = peers.iter().peekable();
+        while let Some(peer) = it.next() {
+            println!("\t\t{{");
+            println!("\t\t\t\"uri\": \"{}\",\n\t\t\t\"region\": \"{}\",\n\t\t\t\"contry\": \"{}\",\n\t\t\t\"is_alive\": {},\n\t\t\t\"latency\": {}",peer.uri,peer.region,peer.country,peer.is_alive,peer.latency);
+            print!("\t\t}}");
+            if it.peek().is_none() {
+                println!();
+            } else {
+                println!(",");
+            }
+        }
+        println!("\t]");
+        println!("}}");
+    } else {
+        println!(
+            "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
+            "URI", "Region", "Country", "Latency"
+        );
+        println!("{0:-<100}", "-");
+        for peer in peers {
+            if !peer.is_alive {
+                break;
+            }
+            println!(
+                "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
+                peer.uri, peer.region, peer.country, peer.latency
+            );
+        }
+    }
 }

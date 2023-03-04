@@ -13,6 +13,7 @@ Usage: peers_updater [OPTIONS]
 
 Options:
   -p, --print           Print the peers sorted by latency
+  -j, --json            Can be used with the `-p` (`--print`) option to print data in json format.
   -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
   -u, --update_cfg      Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
   -a, --api             Add/remove peers during execution (requires enabling the admin API)
@@ -123,6 +124,7 @@ Usage: peers_updater [OPTIONS]
 
 Options:
   -p, --print                   Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
+  -j, --json                    Can be used with the `-p` (`--print`) option to print data in json format.
   -i, --ignore <VALUE>          A space-separated string of characters. Peers whose URIs contain combinations of this characters will not be added to the configuration
   -I, --ignore_country <VALUE>  A space-separated string containing the names of countries that will not be added to the configuration
   -h, --help                    Print help

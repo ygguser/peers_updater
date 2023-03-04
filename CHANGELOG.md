@@ -26,6 +26,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - in case of vulnerabilities.
 -->
 
+## [0.4.0] - 2023-x-x
+
+### Added
+
+- Added the ability to print an array of peers sorted by latency in json format (`-j` option).
+
 ## [0.3.1] - 2023-03-01
 
 ### Fixed

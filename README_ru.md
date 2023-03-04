@@ -13,6 +13,7 @@
 
 Опции:
   -p, --print           Вывод отсортированного по задержке доступа списка пиров
+  -j, --json            Может использоваться с опцией `-p` (`--print`) для вывода данных в формате json.
   -c, --config <FILE>   Путь к конфигурационному файлу Yggdrasil [по-умолчанию: /etc/yggdrasil.conf или C:\ProgramData\Yggdrasil\yggdrasil.conf]
   -u, --update_cfg      Вносить изменения в конфигурационный файл. Если не указано, изменения в файл вноситься не будут.
   -a, --api             Добавлять/удалять пиры с помощью Admin API (требуется включение  admin API в настройках)
@@ -123,6 +124,7 @@ Usage: peers_updater [OPTIONS]
 
 Options:
   -p, --print                   Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
+  -j, --json                    Can be used with the `-p` (`--print`) option to print data in json format.
   -i, --ignore <VALUE>          A space-separated string of characters. Peers whose URIs contain combinations of this characters will not be added to the configuration
   -I, --ignore_country <VALUE>  A space-separated string containing the names of countries that will not be added to the configuration
   -h, --help                    Print help
