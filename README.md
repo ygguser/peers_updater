@@ -114,7 +114,7 @@ Possible values of the features parameter:
 
 - `updating_cfg` - updating the Yggdrasil configuration file
 - `using_api` - using the API to update peers
-- `self_updating` - possibility of self-updating
+- `self_updating` - the possibility of self-updating
 
 This is how the options help for a program compiled with the `--no-default-features` option looks like:
 
