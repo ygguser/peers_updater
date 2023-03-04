@@ -24,7 +24,6 @@ pub fn add_peers_to_conf_new(
     conf_path: &PathBuf,
     n_peers: u8,
     always_in_p: Option<&String>,
-
     cfg_txt: &str,
 ) {
     let mut char_vec: Vec<char> = cfg_txt.chars().collect();

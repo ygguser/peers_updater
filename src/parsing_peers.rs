@@ -12,6 +12,16 @@ struct PPFile {
     country: String,
 }
 
+impl PPFile {
+    pub fn new(path: &std::path::PathBuf, region: &str, country: &str) -> Self {
+        PPFile {
+            path: std::path::PathBuf::from(path),
+            region: String::from(region),
+            country: String::from(country),
+        }
+    }
+}
+
 fn collect_files(
     dir: &std::path::PathBuf,
     file_patches: &mut Vec<PPFile>,
@@ -23,30 +33,26 @@ fn collect_files(
         let metadata = std::fs::metadata(&path)?;
         if metadata.is_file() {
             let country = match path.file_stem() {
-                Some(_c) => match _c.to_os_string().into_string() {
-                    Ok(_co) => _co,
-                    _ => "Unknown".to_string(),
+                Some(_c) => match _c.to_str() {
+                    Some(_co) => _co,
+                    _ => "Unknown",
                 },
-                _ => "Unknown".to_string(),
+                _ => "Unknown",
             };
 
-            if ignored_countries.contains(&country.as_str()) {
+            if ignored_countries.contains(&country) {
                 continue;
             }
 
             let region = match dir.file_stem() {
-                Some(_r) => match _r.to_os_string().into_string() {
-                    Ok(_reg) => _reg,
-                    _ => "Unknown".to_string(),
+                Some(_r) => match _r.to_str() {
+                    Some(_reg) => _reg,
+                    _ => "Unknown",
                 },
-                _ => "Unknown".to_string(),
+                _ => "Unknown",
             };
 
-            file_patches.push(PPFile {
-                path,
-                country,
-                region,
-            });
+            file_patches.push(PPFile::new(&path, region, country));
         } else if let Err(e) = collect_files(&path, file_patches, ignored_countries) {
             eprintln!("Failed to collect *.md files ({}).", e);
             process::exit(1);
@@ -73,7 +79,7 @@ pub fn collect_peers(
     let ignored_peers: &Vec<&str> = &(ignored_peers_str.split(' ').collect());
     let ignored_countries: &Vec<&str> = &(ignored_countries_str.split(' ').collect());
 
-    let mut pp_files: Vec<PPFile> = Default::default();
+    let mut pp_files: Vec<PPFile> = Vec::with_capacity(30);
     if let Err(e) = collect_files(path, &mut pp_files, ignored_countries) {
         eprintln!("Failed to collect *.md files ({}).", e);
         process::exit(1);
@@ -85,7 +91,7 @@ pub fn collect_peers(
             for line in lines.into_iter().flatten() {
                 for peer_ in re.captures_iter(line.as_str()) {
                     let uri = match peer_.get(0) {
-                        Some(_u) => _u.as_str().to_string(),
+                        Some(_u) => _u.as_str(),
                         None => {
                             continue;
                         }
@@ -102,12 +108,8 @@ pub fn collect_peers(
                     }
                     v.push(Peer::new(
                         uri,
-                        peer_
-                            .get(2)
-                            .map_or("".to_string(), |m| m.as_str().to_string()),
-                        peer_
-                            .get(3)
-                            .map_or("".to_string(), |m| m.as_str().to_string()),
+                        peer_.get(2).map_or("", |m| m.as_str()),
+                        peer_.get(3).map_or("", |m| m.as_str()),
                         // peer_
                         //     .get(1)
                         //     .map_or("".to_string(), |m| m.as_str().to_string()),

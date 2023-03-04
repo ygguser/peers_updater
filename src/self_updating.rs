@@ -4,6 +4,7 @@
 //
 // Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
 // ---------------------------------------------------------------------------------------------
+use std::path::PathBuf;
 
 struct Version {
     major: u8,
@@ -217,11 +218,7 @@ fn get_asset_url(as_array: &Vec<nu_json::Value>, target: &str) -> Option<String>
     None
 }
 
-fn replace_executable_file(
-    src: &std::path::PathBuf,
-    dst: &std::path::PathBuf,
-    tmp: &std::path::PathBuf,
-) {
+fn replace_executable_file(src: &PathBuf, dst: &PathBuf, tmp: &PathBuf) {
     if dst.exists() {
         if let Err(e) = std::fs::rename(dst, tmp) {
             eprintln!("Failed to move dst to tmp. ({}).", e);

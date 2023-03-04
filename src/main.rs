@@ -25,7 +25,6 @@ mod self_updating;
 
 mod clap_args;
 mod download_file;
-mod latency;
 mod parsing_peers;
 mod peer;
 mod tmpdir;
@@ -157,7 +156,7 @@ fn main() {
     std::thread::scope(|scope| {
         for peer in &mut peers {
             scope.spawn(move || {
-                crate::latency::set_latency(peer);
+                peer.set_latency();
             });
         }
     });
@@ -205,7 +204,7 @@ fn main() {
                 }
             };
 
-            let exrta_peers: Option<&String> = matches.get_one::<String>("extra");
+            let exrta_peers: Option<&String> = matches.get_one("extra");
 
             // Adding peers to the configuration file
             #[cfg(feature = "updating_cfg")]

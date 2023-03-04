@@ -1,10 +1,10 @@
+use std::path::{Path, PathBuf};
+
 static mut TMPDIR_COUNT: u8 = 0;
 
-pub fn create_tmp_dir(
-    in_dir: Option<&std::path::Path>,
-) -> Result<std::path::PathBuf, std::io::Error> {
-    let tmp_dir_path: std::path::PathBuf = if let Some(in_dir_val) = in_dir {
-        std::path::PathBuf::from(in_dir_val).join(format!(
+pub fn create_tmp_dir(in_dir: Option<&Path>) -> Result<PathBuf, std::io::Error> {
+    let tmp_dir_path: PathBuf = if let Some(in_dir_val) = in_dir {
+        PathBuf::from(in_dir_val).join(format!(
             "{}{:x}-{:x}",
             "peers_updater_",
             std::process::id(),
