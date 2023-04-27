@@ -8,6 +8,13 @@ use std::fs::File;
 use std::io::prelude::Read;
 use std::path::PathBuf;
 
+const COMM_2SLASHES_BEG: &[char; 2] = &['/', '/'];
+const COMM_SLASH_STAR_BEG: &[char; 2] = &['/', '*'];
+const COMM_SLASH_STAR_END: &[char; 2] = &['*', '/'];
+const PEERS: &[char; 6] = &['P', 'e', 'e', 'r', 's', ':'];
+const PEERS_JSON: &[char; 8] = &['"', 'P', 'e', 'e', 'r', 's', '"', ':'];
+const LF: &[char; 1] = &[10 as char];
+
 pub fn read_config(path: &PathBuf) -> std::io::Result<String> {
     let mut f = File::open(path)?;
     let mut buffer = String::new();
@@ -89,17 +96,16 @@ fn find_peers_start_pos(chars: &Vec<char>, from: usize, to: usize) -> usize {
             if *cr == '#' {
                 let _a = format!("{}", cr);
                 cur_pos += 1;
-                cur_pos =
-                    find_comment_end_and_continue(chars, &vec![10 as char], cur_pos, to, true);
-            } else if chars[cur_pos..cur_pos + 2].to_vec() == ['/', '/'] {
+                cur_pos = find_comment_end_and_continue(chars, LF, cur_pos, to, true);
+            } else if chars[cur_pos..cur_pos + 2] == *COMM_2SLASHES_BEG {
+                cur_pos += 2;
+                cur_pos = find_comment_end_and_continue(chars, LF, cur_pos, to, true);
+            } else if chars[cur_pos..cur_pos + 2] == *COMM_SLASH_STAR_BEG {
                 cur_pos += 2;
                 cur_pos =
-                    find_comment_end_and_continue(chars, &vec![10 as char], cur_pos, to, true);
-            } else if chars[cur_pos..cur_pos + 2].to_vec() == ['/', '*'] {
-                cur_pos += 2;
-                cur_pos = find_comment_end_and_continue(chars, &vec!['*', '/'], cur_pos, to, true);
-            } else if chars[cur_pos..cur_pos + 6] == ['P', 'e', 'e', 'r', 's', ':']
-                || chars[cur_pos..cur_pos + 8] == ['"', 'P', 'e', 'e', 'r', 's', '"', ':']
+                    find_comment_end_and_continue(chars, COMM_SLASH_STAR_END, cur_pos, to, true);
+            } else if chars[cur_pos..cur_pos + 6] == *PEERS
+                || chars[cur_pos..cur_pos + 8] == *PEERS_JSON
             {
                 return cur_pos;
             }
@@ -114,7 +120,7 @@ fn find_peers_start_pos(chars: &Vec<char>, from: usize, to: usize) -> usize {
 #[cfg(feature = "updating_cfg")]
 fn find_comment_end_and_continue(
     chars: &Vec<char>,
-    symbols: &Vec<char>,
+    symbols: &[char],
     from: usize,
     to: usize,
     find_start: bool,
@@ -123,7 +129,7 @@ fn find_comment_end_and_continue(
     let symbols_len = symbols.len();
 
     while cur_pos <= to {
-        if chars[cur_pos..cur_pos + symbols_len].to_vec() == *symbols {
+        if chars[cur_pos..cur_pos + symbols_len] == *symbols {
             if find_start {
                 cur_pos += symbols_len;
                 return cur_pos;
@@ -150,8 +156,7 @@ fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usiz
             if cr_ == '#' {
                 let _a = format!("{}", cr);
                 cur_pos += 1;
-                cur_pos =
-                    find_comment_end_and_continue(chars, &vec![10 as char], cur_pos, to, false);
+                cur_pos = find_comment_end_and_continue(chars, LF, cur_pos, to, false);
             } else if cr_ == '[' {
                 open_count += 1;
             } else if cr_ == ']' {
@@ -159,13 +164,13 @@ fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usiz
                 if open_count > 0 && open_count == close_count {
                     return cur_pos;
                 }
-            } else if chars[cur_pos..cur_pos + 2].to_vec() == ['/', '/'] {
+            } else if chars[cur_pos..cur_pos + 2] == *COMM_2SLASHES_BEG {
+                cur_pos += 2;
+                cur_pos = find_comment_end_and_continue(chars, LF, cur_pos, to, false);
+            } else if chars[cur_pos..cur_pos + 2] == *COMM_SLASH_STAR_BEG {
                 cur_pos += 2;
                 cur_pos =
-                    find_comment_end_and_continue(chars, &vec![10 as char], cur_pos, to, false);
-            } else if chars[cur_pos..cur_pos + 2].to_vec() == ['/', '*'] {
-                cur_pos += 2;
-                cur_pos = find_comment_end_and_continue(chars, &vec!['*', '/'], cur_pos, to, false);
+                    find_comment_end_and_continue(chars, COMM_SLASH_STAR_END, cur_pos, to, false);
             }
         }
         cur_pos += 1;
