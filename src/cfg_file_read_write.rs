@@ -1,18 +1,21 @@
 #[cfg(feature = "updating_cfg")]
-use crate::peer::Peer;
-
-#[cfg(feature = "updating_cfg")]
-use std::io::Write;
+use {crate::peer::Peer, std::io::Write};
 
 use std::fs::File;
 use std::io::prelude::Read;
 use std::path::PathBuf;
 
+#[cfg(feature = "updating_cfg")]
 const COMM_2SLASHES_BEG: &[char; 2] = &['/', '/'];
+#[cfg(feature = "updating_cfg")]
 const COMM_SLASH_STAR_BEG: &[char; 2] = &['/', '*'];
+#[cfg(feature = "updating_cfg")]
 const COMM_SLASH_STAR_END: &[char; 2] = &['*', '/'];
+#[cfg(feature = "updating_cfg")]
 const PEERS: &[char; 6] = &['P', 'e', 'e', 'r', 's', ':'];
+#[cfg(feature = "updating_cfg")]
 const PEERS_JSON: &[char; 8] = &['"', 'P', 'e', 'e', 'r', 's', '"', ':'];
+#[cfg(feature = "updating_cfg")]
 const LF: &[char; 1] = &[10 as char];
 
 pub fn read_config(path: &PathBuf) -> std::io::Result<String> {

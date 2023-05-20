@@ -1,9 +1,10 @@
 use clap::arg;
 
 #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
-use clap::{value_parser, Arg};
-#[cfg(any(feature = "updating_cfg", feature = "using_api"))]
-use std::path::PathBuf;
+use {
+    clap::{value_parser, Arg},
+    std::path::PathBuf,
+};
 
 pub fn build_args() -> clap::ArgMatches {
     let mut app = clap::Command::new("Yggdrasil peers updater")
