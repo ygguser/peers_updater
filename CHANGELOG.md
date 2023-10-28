@@ -25,6 +25,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.2] - 2023-10-28
+
+### Added
+
+- Adaptation for Yggdrasil v. 0.5 (quic:// support)
 
 ## [0.3.1] - 2023-03-01
 

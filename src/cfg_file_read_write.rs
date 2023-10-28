@@ -192,6 +192,7 @@ mod tests {
             #commets
             Peers: [
                 tcp://some.peer.uri:34589
+                quic://another.peer.uri:55555 #comment
                 ]
             }";
 
@@ -208,6 +209,7 @@ mod tests {
                 .collect::<String>(),
             "Peers: [
                 tcp://some.peer.uri:34589
+                quic://another.peer.uri:55555 #comment
                 ]"
         );
     }

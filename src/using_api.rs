@@ -253,7 +253,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     } else {
         //tcp
         //Parsing the URI of the admin socket
-        let re = match regex::Regex::new(r"(tcp|tls)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
+        let re = match regex::Regex::new(r"(tcp|tls|quik)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
             Ok(_r) => _r,
             Err(e) => {
                 eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
