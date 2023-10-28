@@ -3,7 +3,11 @@
 DIR=$(git rev-parse --show-toplevel)
 cd "$DIR"
 
-cross +nightly build --release --target="$1"
+if [[ "$1" == *"darwin"* ]]; then
+    cargo build --release --target $1
+else
+    cross +nightly build --release --target="$1"
+fi
 
 if [[ "$1" == *"windows"* ]]; then
     BINNAME="target/$1/release/peers_updater.exe"
