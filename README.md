@@ -102,7 +102,7 @@ Download links for peers_updater for the desired architecture are available on t
 | arm-unknown-linux-gnueabi	| ARMv6 Linux (kernel 3.2, glibc 2.17) |
 | armv7-unknown-linux-gnueabihf	| ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17) |
 | x86_64-apple-darwin | 64-bit macOS (10.7+, Lion+) |
-
+| x86_64h-apple-darwin | macOS with late-gen Intel (at least Haswell) |
 
 #### Build from source
 
