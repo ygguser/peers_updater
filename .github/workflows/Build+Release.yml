@@ -72,6 +72,8 @@ jobs:
           rustup update
           rustup target add x86_64-apple-darwin
           #rustup target add x86_64h-apple-darwin
+          rustup +nightly component add rust-src
+          cargo +nightly build -Z build-std --target x86_64h-apple-darwin
           
       - name: Preparing for cross-compilation (arm)
         if: ${{contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi')}}
