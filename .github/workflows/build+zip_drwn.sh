@@ -6,6 +6,8 @@ wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
 mv MacOSX10.10.sdk.tar.xz tarballs/
 UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
 
+cd ..
+
 #MACOS_TARGET="x86_64-apple-darwin"
 MACOS_TARGET="$1"
 
