@@ -59,8 +59,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
-        #target: [ x86_64-apple-darwin ]
+        #target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
+        target: [ x86_64-apple-darwin ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -72,10 +72,10 @@ jobs:
           cargo install cross
           rustup update
           rustup toolchain install nightly
-          curl -L https://github.com/roblabla/MacOSX-SDKs/releases/download/13.3/MacOSX13.3.sdk.tar.xz | tar xJ
-          export SDKROOT=$(pwd)/MacOSX13.3.sdk/
-          export PATH=$PATH:~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/
-          export CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER=rust-lld
+          #curl -L https://github.com/roblabla/MacOSX-SDKs/releases/download/13.3/MacOSX13.3.sdk.tar.xz | tar xJ
+          #export SDKROOT=$(pwd)/MacOSX13.3.sdk/
+          #export PATH=$PATH:~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/lib/rustlib/x86_64-unknown-linux-gnu/bin/
+          #export CARGO_TARGET_X86_64_APPLE_DARWIN_LINKER=rust-lld
           rustup target add x86_64-apple-darwin
           rustup component add rust-src --toolchain nightly
           #cargo build --release --target x86_64-apple-darwin
@@ -97,7 +97,7 @@ jobs:
           #mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
           #cargo update -p clap_lex@0.6.0 --precise 0.5.0
 
-      - name: Preparing for cross-compilation (!arm)         
+      - name: Preparing for cross-compilation (other)         
         if: ${{!contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin')}}
         run: |
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-aarch64-linux-gnu
