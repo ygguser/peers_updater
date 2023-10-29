@@ -33,7 +33,11 @@ cd "$DIR"
 
 echo "curr dir: $(pwd)"
 
-#cross +nightly build --release --target="$1"
+if [[ "$1" == *"x86_64h"* ]]; then
+          rustup +nightly component add rust-src
+          cargo +nightly build -Z build-std --target x86_64h-apple-darwin
+fi
+
 cargo build --release --target "${MACOS_TARGET}"
 
 BINNAME="target/$1/release/peers_updater"
