@@ -1,8 +1,5 @@
 #!/bin/bash
 
-DIR=$(git rev-parse --show-toplevel)
-cd "$DIR"
-
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
 wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
@@ -18,6 +15,9 @@ echo
 # Add osxcross toolchain to path
 export PATH="$(pwd)/osxcross/target/bin:$PATH"
 
+echo "pwd: $(pwd)"
+echo "added path: $(pwd)/osxcross/target/bin"
+
 # Make libz-sys (git2-rs -> libgit2-sys -> libz-sys) build as a statically linked lib
 # This prevents the host zlib from being linked
 export LIBZ_SYS_STATIC=1
@@ -25,6 +25,11 @@ export LIBZ_SYS_STATIC=1
 # Use Clang for C/C++ builds
 export CC=o64-clang
 export CXX=o64-clang++
+
+DIR=$(git rev-parse --show-toplevel)
+cd "$DIR"
+
+echo "curr dir: $(pwd)"
 
 #cross +nightly build --release --target="$1"
 cargo build --release --target "${MACOS_TARGET}"
