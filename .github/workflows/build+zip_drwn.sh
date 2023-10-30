@@ -33,11 +33,17 @@ cd "$DIR"
 
 echo "curr dir: $(pwd)"
 
-#cross +nightly build --release --target="$1"
-cargo build --release --target "${MACOS_TARGET}"
+if [[ "$1" == *"x86_64h"* ]]; then
+    rustup +nightly component add rust-src
+    #export RUSTFLAGS="-Zbuild-std,panic_abort"
+    #export CARGO_TARGET_X86_64H_APPLE_DARWIN_LINKER=x86_64-apple-darwin14-clang
+    RUSTFLAGS="-Zbuild-std,panic_abort" CARGO_TARGET_X86_64H_APPLE_DARWIN_LINKER=x86_64-apple-darwin14-clang cargo +nightly build --config "ar = x86_64-apple-darwin14-ar" -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
+fi
+
+cargo build --config 'ar = "x86_64-apple-darwin14-ar"' --config 'linker = "x86_64-apple-darwin14-clang"' --config 'strip = false' --release --target "${MACOS_TARGET}"
 
 BINNAME="target/$1/release/peers_updater"
 chmod og+x "$BINNAME"
-upx --ultra-brute "$BINNAME"
+#upx --ultra-brute "$BINNAME"
 
 zip -9 -j "target/$1/release/$1.zip" "$BINNAME"
