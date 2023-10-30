@@ -37,7 +37,7 @@ echo "curr dir: $(pwd)"
 #    rustup +nightly component add rust-src
 #    #export RUSTFLAGS="-Zbuild-std,panic_abort"
 #    #export CARGO_TARGET_X86_64H_APPLE_DARWIN_LINKER=x86_64-apple-darwin14-clang
-#    cargo +nightly build --config 'ar = ""' --config 'ar = "x86_64-apple-darwin14-ar"' -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
+#    RUSTFLAGS="-Zbuild-std,panic_abort" cargo +nightly build --config "target.x86_64h-apple-darwin.ar = 'x86_64-apple-darwin14-ar'" --config "target.x86_64h-apple-darwin.linker = 'x86_64-apple-darwin14-clang'" -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
 #fi
 
 cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
