@@ -13,7 +13,7 @@ Usage: peers_updater [OPTIONS]
 
 Options:
   -p, --print           Print the peers sorted by latency
-  -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
+  -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
   -u, --update_cfg      Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
   -a, --api             Add/remove peers during execution (requires enabling the admin API)
   -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
@@ -80,7 +80,7 @@ sudo crontab -e
 
 At the end of the file, add: 
 ```
-0 0 * * 0 /path/peers_updater -u -n 3 -r -c /etc/yggdrasil.conf >/dev/null 2>&1
+0 0 * * 0 /path/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf >/dev/null 2>&1
 ```
 Save the changes.
 

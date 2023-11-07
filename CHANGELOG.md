@@ -25,6 +25,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.3] - 2023-11-07
+
+### Changed
+
+- Сhanged default paths: `/etc/yggdrasil.conf` -> `/etc/yggdrasil/yggdrasil.conf`; `/var/run/yggdrasil.sock` -> `/var/run/yggdrasil/yggdrasil.sock`
+
 ## [0.3.2] - 2023-10-28
 
 ### Added

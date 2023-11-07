@@ -13,7 +13,7 @@
 
 Опции:
   -p, --print           Вывод отсортированного по задержке доступа списка пиров
-  -c, --config <FILE>   Путь к конфигурационному файлу Yggdrasil [по-умолчанию: /etc/yggdrasil.conf или C:\ProgramData\Yggdrasil\yggdrasil.conf]
+  -c, --config <FILE>   Путь к конфигурационному файлу Yggdrasil [по-умолчанию: /etc/yggdrasil/yggdrasil.conf или C:\ProgramData\Yggdrasil\yggdrasil.conf]
   -u, --update_cfg      Вносить изменения в конфигурационный файл. Если не указано, изменения в файл вноситься не будут.
   -a, --api             Добавлять/удалять пиры с помощью Admin API (требуется включение  admin API в настройках)
   -n, --number <VALUE>  Количество пиров, которое будет автоматически добавлено (без учета дополнительных пиров) [по-умолчанию: 3]
@@ -80,7 +80,7 @@ sudo crontab -e
 
 В конец файла добавляем:
 ```
-0 0 * * 0 /path/peers_updater -u -n 3 -r -c /etc/yggdrasil.conf >/dev/null 2>&1
+0 0 * * 0 /path/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf >/dev/null 2>&1
 ```
 Сохраняем изменения.
 

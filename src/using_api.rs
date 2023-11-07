@@ -318,13 +318,13 @@ mod tests {
     #[test]
     fn test_get_socket_addr_unix() {
         let admin_listen_param = "{
-            AdminListen: unix:///var/run/yggdrasil.sock
+            AdminListen: unix:///var/run/yggdrasil/yggdrasil.sock
         }";
         let mut hjson_obj = nu_json::from_str(admin_listen_param).unwrap();
         #[cfg(not(target_os = "windows"))]
         assert_eq!(
             get_socket_addr(&mut hjson_obj),
-            SockAddr::Unix("/var/run/yggdrasil.sock".to_string())
+            SockAddr::Unix("/var/run/yggdrasil/yggdrasil.sock".to_string())
         );
         #[cfg(target_os = "windows")]
         assert_eq!(get_socket_addr(&mut hjson_obj), SockAddr::None);
