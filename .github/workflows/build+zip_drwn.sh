@@ -8,7 +8,7 @@ mv MacOSX10.10.sdk.tar.xz tarballs/
 curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
 export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
+UNATTENDED=yes OSX_VERSION_MIN=10.12 ./build.sh
 
 cd ..
 
