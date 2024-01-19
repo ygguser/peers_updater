@@ -15,8 +15,8 @@ export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
 
-#sudo mkdir -p /usr/local/osx-ndk-x86
-#sudo mv target/* /usr/local/osx-ndk-x86
+sudo mkdir -p /usr/local/osx-ndk-x86
+sudo mv target/* /usr/local/osx-ndk-x86
 
 cd ..
 
@@ -27,9 +27,8 @@ echo "Building target for platform ${MACOS_TARGET}"
 echo
 
 # Add osxcross toolchain to path
-export PATH="$(pwd)/osxcross/target/bin:$PATH"
-
-#export PATH=/usr/local/osx-ndk-x86/bin:$PATH
+#export PATH="$(pwd)/osxcross/target/bin:$PATH"
+export PATH=/usr/local/osx-ndk-x86/bin:$PATH
 export PKG_CONFIG_ALLOW_CROSS=1
 
 echo "pwd: $(pwd)"
