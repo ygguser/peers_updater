@@ -4,15 +4,19 @@ git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
 
 #https://github.com/phracker/MacOSX-SDKs/releases #versions of MacOSX sdk
-wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
-№wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
+#wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
+wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
 #wget -nc https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz
-mv MacOSX10.10.sdk.tar.xz tarballs/
+mv MacOSX10.11.sdk.tar.xz tarballs/
 
 #curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
 #export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-UNATTENDED=yes OSX_VERSION_MIN=10.10 ./build.sh
+sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
+UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
+
+#sudo mkdir -p /usr/local/osx-ndk-x86
+#sudo mv target/* /usr/local/osx-ndk-x86
 
 cd ..
 
@@ -24,6 +28,9 @@ echo
 
 # Add osxcross toolchain to path
 export PATH="$(pwd)/osxcross/target/bin:$PATH"
+
+#export PATH=/usr/local/osx-ndk-x86/bin:$PATH
+export PKG_CONFIG_ALLOW_CROSS=1
 
 echo "pwd: $(pwd)"
 echo "added path: $(pwd)/osxcross/target/bin"
