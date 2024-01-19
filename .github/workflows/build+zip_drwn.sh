@@ -5,13 +5,13 @@ cd osxcross
 
 #https://github.com/phracker/MacOSX-SDKs/releases #versions of MacOSX sdk
 #wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
-wget -nc https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.15.sdk.tar.xz
-mv MacOSX10.15.sdk.tar.xz tarballs/
+wget -nc https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz
+mv MacOSX10.10.sdk.tar.xz tarballs/
 
 curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
 export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-UNATTENDED=yes OSX_VERSION_MIN=10.12 ./build.sh
+UNATTENDED=yes OSX_VERSION_MIN=10.10 ./build.sh
 
 cd ..
 
