@@ -25,6 +25,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.4] - 2024-08-06
+
+### Added
+
+- Added WebSocket support (ws:// | wss://)
+
 ## [0.3.3] - 2023-11-07
 
 ### Changed

@@ -68,7 +68,7 @@ pub fn collect_peers(
     ignored_peers_str: &str,
     ignored_countries_str: &str,
 ) -> io::Result<bool> {
-    let re = match Regex::new(r"(tcp|tls|quic)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
+    let re = match Regex::new(r"(tcp|tls|quic|ws|wss)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
         Ok(_r) => _r,
         Err(e) => {
             eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
