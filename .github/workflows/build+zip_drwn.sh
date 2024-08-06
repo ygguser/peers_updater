@@ -2,9 +2,21 @@
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
-wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
-mv MacOSX10.10.sdk.tar.xz tarballs/
+
+#https://github.com/phracker/MacOSX-SDKs/releases #versions of MacOSX sdk
+#wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
+wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.11.sdk.tar.xz
+#wget -nc https://github.com/phracker/MacOSX-SDKs/releases/download/11.3/MacOSX10.10.sdk.tar.xz
+mv MacOSX10.11.sdk.tar.xz tarballs/
+
+curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
+export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
+
+sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
+
+sudo mkdir -p /usr/local/osx-ndk-x86
+sudo mv target/* /usr/local/osx-ndk-x86
 
 cd ..
 
@@ -15,7 +27,9 @@ echo "Building target for platform ${MACOS_TARGET}"
 echo
 
 # Add osxcross toolchain to path
-export PATH="$(pwd)/osxcross/target/bin:$PATH"
+#export PATH="$(pwd)/osxcross/target/bin:$PATH"
+export PATH=/usr/local/osx-ndk-x86/bin:$PATH
+export PKG_CONFIG_ALLOW_CROSS=1
 
 echo "pwd: $(pwd)"
 echo "added path: $(pwd)/osxcross/target/bin"
@@ -40,7 +54,8 @@ echo "curr dir: $(pwd)"
 #    RUSTFLAGS="-Zbuild-std,panic_abort" cargo +nightly build --config "target.x86_64h-apple-darwin.ar = 'x86_64-apple-darwin14-ar'" --config "target.x86_64h-apple-darwin.linker = 'x86_64-apple-darwin14-clang'" -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
 #fi
 
-cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
+#cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
+cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin15-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin15-gcc'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
 
 BINNAME="target/$1/release/peers_updater"
 chmod og+x "$BINNAME"
