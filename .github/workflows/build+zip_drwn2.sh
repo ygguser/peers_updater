@@ -1,8 +1,8 @@
 #!/bin/bash
 
-apt update
+sudo apt update
 
-apt install \
+sudo apt install \
     clang \
     gcc \
     g++ \
@@ -11,7 +11,7 @@ apt install \
     libmpfr-dev \
     libgmp-dev
 
-DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
+DEBIAN_FRONTEND='noninteractive' sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
 
 rustup target add x86_64-apple-darwin
 
@@ -36,8 +36,8 @@ UNATTENDED=1 ./build.sh
 
 export PATH=$(pwd)/target/bin/$PATH
 
-mkdir /usr/local/darwin-ndk-x86_64
-mv target/* /usr/local/darwin-ndk-x86_64/
+sudo mkdir /usr/local/darwin-ndk-x86_64
+sudo mv target/* /usr/local/darwin-ndk-x86_64/
 
 export PKG_CONFIG_ALLOW_CROSS=1
 export PATH=/usr/local/darwin-ndk-x86_64/bin/$PATH
