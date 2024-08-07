@@ -1,12 +1,5 @@
 #!/bin/bash
 
-wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/xar/xar-1.5.2.tar.gz
-tar xf xar-1.5.2.tar.gz
-cd xar-1.5.2
-./configure
-make
-make install
-
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
 
@@ -61,6 +54,9 @@ echo "curr dir: $(pwd)"
 #    #export CARGO_TARGET_X86_64H_APPLE_DARWIN_LINKER=x86_64-apple-darwin14-clang
 #    RUSTFLAGS="-Zbuild-std,panic_abort" cargo +nightly build --config "target.x86_64h-apple-darwin.ar = 'x86_64-apple-darwin14-ar'" --config "target.x86_64h-apple-darwin.linker = 'x86_64-apple-darwin14-clang'" -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
 #fi
+
+echo /usr/local/darwin-ndk-x86_64/lib | sudo tee /etc/ld.so.conf.d/darwin.conf
+ldconfig
 
 #cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
 cargo build --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
