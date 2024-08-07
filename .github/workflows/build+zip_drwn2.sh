@@ -15,10 +15,10 @@ DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef'
 
 rustup target add x86_64-apple-darwin
 
-curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
-export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
+№curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
+№export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
+№sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
@@ -33,6 +33,8 @@ echo /usr/local/darwin-ndk-x86_64/lib | sudo tee /etc/ld.so.conf.d/darwin.conf
 sudo ldconfig
 
 UNATTENDED=1 ./build.sh
+
+export PATH=$(pwd)/target/bin/$PATH
 
 mkdir /usr/local/darwin-ndk-x86_64
 mv target/* /usr/local/darwin-ndk-x86_64/
