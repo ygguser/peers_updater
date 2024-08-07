@@ -1,5 +1,12 @@
 #!/bin/bash
 
+wget https://storage.googleapis.com/google-code-archive-downloads/v2/code.google.com/xar/xar-1.5.2.tar.gz
+tar xf xar-1.5.2.tar.gz
+cd xar-1.5.2
+./configure
+make
+make install
+
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
 
