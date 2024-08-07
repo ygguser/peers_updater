@@ -21,8 +21,8 @@ rustup target add x86_64-apple-darwin
 #sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
 #wget -O Xcode_14.2.xip https://drive.google.com/uc?export=download&id=1NWh_pv9M0Ey336ODU1JGkSuKxz2DWBxK
-curl --cookie-jar cookie_file 'https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip'
-curl --cookie cookie_file --remote-name 'https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip'
+#curl --cookie-jar cookie_file 'https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip'
+#curl --cookie cookie_file --remote-name 'https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip'
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
