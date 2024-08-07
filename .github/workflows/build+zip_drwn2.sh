@@ -20,10 +20,12 @@ rustup target add x86_64-apple-darwin
 
 #sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
+wget -O Xcode_14.2.xip https://drive.usercontent.google.com/download?id=1NWh_pv9M0Ey336ODU1JGkSuKxz2DWBxK&export=download&authuser=0&confirm=t&uuid=2ba6456b-ced5-4982-aacf-5620738f6045&at=APZUnTUwAEvjGvr0JQc4tjEK-OE4:1723055171308
+
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
 
-./tools/gen_sdk_package_pbzx.sh /home/ttys3/Downloads/Compressed/Xcode_14.2.xip
+./tools/gen_sdk_package_pbzx.sh ../Xcode_14.2.xip
 
 mv MacOSX13.1.sdk.tar.xz ./tarballs
 
