@@ -55,8 +55,8 @@ echo "curr dir: $(pwd)"
 #    RUSTFLAGS="-Zbuild-std,panic_abort" cargo +nightly build --config "target.x86_64h-apple-darwin.ar = 'x86_64-apple-darwin14-ar'" --config "target.x86_64h-apple-darwin.linker = 'x86_64-apple-darwin14-clang'" -Z build-std,panic_abort -Z build-std-features=panic_immediate_abort -Z build-std=core --target x86_64h-apple-darwin
 #fi
 
-#cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
-cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin15-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin15-gcc'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
+cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
+#cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin15-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin15-gcc'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
 
 BINNAME="target/$1/release/peers_updater"
 chmod og+x "$BINNAME"
