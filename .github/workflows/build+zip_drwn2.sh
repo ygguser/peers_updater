@@ -15,10 +15,10 @@ DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef'
 
 rustup target add x86_64-apple-darwin
 
-№curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
-№export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
+#curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
+#export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-№sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
+#sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
@@ -43,6 +43,7 @@ export PKG_CONFIG_ALLOW_CROSS=1
 export PATH=/usr/local/darwin-ndk-x86_64/bin/$PATH
 echo "pwd: $(pwd)"
 echo "added path: $(pwd)/osxcross/target/bin"
+ls $(pwd)/target/bin/
 export LIBZ_SYS_STATIC=1
 export CC=o64-clang
 export CXX=o64-clang++
