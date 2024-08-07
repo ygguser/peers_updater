@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo apt update
+sudo apt update && sudo apt upgrade
 
 sudo apt install \
     clang \
@@ -11,7 +11,7 @@ sudo apt install \
     libmpfr-dev \
     libgmp-dev
 
-DEBIAN_FRONTEND='noninteractive' sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
+#DEBIAN_FRONTEND='noninteractive' sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
 
 rustup target add x86_64-apple-darwin
 
@@ -20,7 +20,7 @@ rustup target add x86_64-apple-darwin
 
 #sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
-wget -O Xcode_14.2.xip https://download.developer.apple.com/Developer_Tools/Xcode_14.2/Xcode_14.2.xip
+wget -O Xcode_14.2.xip https://drive.google.com/uc?export=download&id=1NWh_pv9M0Ey336ODU1JGkSuKxz2DWBxK
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
