@@ -1,5 +1,7 @@
 #!/bin/bash
 
+apt update
+
 apt install \
     clang \
     gcc \
@@ -8,6 +10,8 @@ apt install \
     libmpc-dev \
     libmpfr-dev \
     libgmp-dev
+
+DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
 
 rustup target add x86_64-apple-darwin
 
@@ -28,9 +32,17 @@ UNATTENDED=1 ./build.sh
 mkdir /usr/local/darwin-ndk-x86_64
 mv target/* /usr/local/darwin-ndk-x86_64/
 
-PATH="/usr/local/darwin-ndk-x86_64/bin/:$PATH" \
-CC=o64-clang \
-CXX=o64-clang++ \
+export PKG_CONFIG_ALLOW_CROSS=1
+export PATH=/usr/local/darwin-ndk-x86_64/bin/$PATH
+echo "pwd: $(pwd)"
+echo "added path: $(pwd)/osxcross/target/bin"
+export LIBZ_SYS_STATIC=1
+export CC=o64-clang
+export CXX=o64-clang++
+
+#PATH="/usr/local/darwin-ndk-x86_64/bin/:$PATH" \
+#CC=o64-clang \
+#CXX=o64-clang++ \
 cargo build --target x86_64-apple-darwin
 
 BINNAME="target/$1/release/peers_updater"
