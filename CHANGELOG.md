@@ -29,7 +29,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Added WebSocket support (ws:// | wss://)
+- Added WebSocket-peers support (ws:// | wss://)
 
 ## [0.3.3] - 2023-11-07
 
