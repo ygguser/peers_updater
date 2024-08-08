@@ -53,28 +53,55 @@ jobs:
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
+  build_and_upload_drwn:
+      name: Create and upload binaries (darwin)
+      needs: [ create_release_draft ]
+      runs-on: macos-12
+      strategy:
+        matrix:
+          target: [ x86_64-apple-darwin ]
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3    
+      
+      - name: Preparing for cross-compilation (darwin)
+        run: |
+          rustup update
+          rustup target add x86_64-apple-darwin
+          #rustup target add x86_64h-apple-darwin
+          #rustup +nightly component add rust-src
+          #cargo +nightly build -Z build-std --target x86_64h-apple-darwin
+   
+      - name: Build and compress binaries (darwin)
+        if: ${{contains(matrix.target, 'darwin')}}
+        run: |
+         #.github/workflows/build+zip_drwn2.sh ${{ matrix.target }} 
+         cargo build --release --target x86_64-apple-darwin
+         chmod og+x "target/x86_64-apple-darwin/release/peers_updater"
+         zip -9 -j "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" "target/x86_64-apple-darwin/release/peers_updater"   
+
+      - name: Add archives to the release draft
+        uses: xresloader/upload-to-github-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+        with:
+          release_id: ${{ env.RELEASE_ID }}
+          file: "${{ github.workspace }}/target/*/release/*.zip"
+          draft: true
+          
   build_and_upload:
     name: Create and upload binaries
     needs: [ create_release_draft ]
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        #target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf, x86_64-apple-darwin ]
-        target: [ x86_64-apple-darwin ]
+        target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf, x86_64-apple-darwin ]
+        #target: [ x86_64-apple-darwin ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-
-      - name: Preparing for cross-compilation (darwin)
-        if: ${{contains(matrix.target, 'darwin')}}
-        run: |
-          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
-          rustup update
-          rustup target add x86_64-apple-darwin
-          #rustup target add x86_64h-apple-darwin
-          #rustup +nightly component add rust-src
-          #cargo +nightly build -Z build-std --target x86_64h-apple-darwin
-          
+ 
       - name: Preparing for cross-compilation (arm)
         if: ${{contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi')}}
         run: |
@@ -102,10 +129,6 @@ jobs:
       - name: Build and compress binaries (other)
         if: ${{!contains(matrix.target, 'darwin')}}
         run: .github/workflows/build+zip.sh ${{ matrix.target }}        
-
-      - name: Build and compress binaries (darwin)
-        if: ${{contains(matrix.target, 'darwin')}}
-        run: .github/workflows/build+zip_drwn2.sh ${{ matrix.target }} 
 
       - name: Add archives to the release draft
         uses: xresloader/upload-to-github-release@main
