@@ -105,11 +105,11 @@ jobs:
         if: ${{contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi')}}
         run: |
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-arm-linux-gnueabihf
-          cargo install cross
           rustup update
-          rustup toolchain install nightly
           rustup component add rust-src
+          rustup toolchain install nightly
           rustup component add rust-src --toolchain nightly
+          cargo install cross
           #rustup toolchain install nightly-2023-02-15-x86_64-unknown-linux-gnu
           #rustup component add rust-src --toolchain nightly-2023-02-15-x86_64-unknown-linux-gnu
           #mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
@@ -118,11 +118,11 @@ jobs:
         if: ${{!contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin')}}
         run: |
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-aarch64-linux-gnu
-          cargo install cross
           rustup update
-          rustup toolchain install nightly
           rustup component add rust-src
+          rustup toolchain install nightly
           rustup component add rust-src --toolchain nightly
+          cargo install cross
           #rustup toolchain install nightly-2023-02-15-x86_64-unknown-linux-gnu
           #rustup component add rust-src --toolchain nightly-2023-02-15-x86_64-unknown-linux-gnu
           #mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu  
