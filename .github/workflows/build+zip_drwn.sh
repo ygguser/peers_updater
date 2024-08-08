@@ -10,11 +10,12 @@ wget -nc https://s3.dockerproject.org/darwin/v2/MacOSX10.10.sdk.tar.xz
 #mv MacOSX10.11.sdk.tar.xz tarballs/
 mv MacOSX10.10.sdk.tar.xz tarballs/
 
-curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
-export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
+#curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
+#export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
 
-sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
-UNATTENDED=yes OSX_VERSION_MIN=10.7 ./build.sh
+#sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
+
+UNATTENDED=yes OSX_VERSION_MIN=10.7 sudo ./build.sh
 
 sudo mkdir -p /usr/local/osx-ndk-x86
 sudo mv target/* /usr/local/osx-ndk-x86
