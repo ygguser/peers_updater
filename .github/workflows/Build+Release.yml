@@ -105,7 +105,7 @@ jobs:
 
       - name: Build and compress binaries (darwin)
         if: ${{contains(matrix.target, 'darwin')}}
-        run: .github/workflows/build+zip_drwn2.sh ${{ matrix.target }} 
+        run: .github/workflows/build+zip_drwn.sh ${{ matrix.target }} 
 
       - name: Add archives to the release draft
         uses: xresloader/upload-to-github-release@main
