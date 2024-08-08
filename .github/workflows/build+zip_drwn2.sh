@@ -9,7 +9,7 @@ sudo apt install \
     zlib1g-dev \
     libmpc-dev \
     libmpfr-dev \
-    libgmp-dev
+    libgmp-dev cmake libcrypto libssl-dev libz-dev liblzma-dev bzip2
 
 rustup target add x86_64-apple-darwin
 
