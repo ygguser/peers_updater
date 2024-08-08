@@ -39,6 +39,8 @@ export PATH=$(pwd)/target/bin/$PATH
 sudo mkdir /usr/local/darwin-ndk-x86_64
 sudo mv target/* /usr/local/darwin-ndk-x86_64/
 
+sudo rm -f ../Xcode_14.2.xip
+
 export PKG_CONFIG_ALLOW_CROSS=1
 export PATH=/usr/local/darwin-ndk-x86_64/bin/$PATH
 echo "pwd: $(pwd)"
