@@ -56,7 +56,7 @@ echo "curr dir: $(pwd)"
 #fi
 
 echo /usr/local/darwin-ndk-x86_64/lib | sudo tee /etc/ld.so.conf.d/darwin.conf
-ldconfig
+sudo ldconfig
 
 #cargo build --config "target.${MACOS_TARGET}.ar = 'x86_64-apple-darwin14-ar'" --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
 cargo build --config "target.${MACOS_TARGET}.linker = 'x86_64-apple-darwin14-clang'" --config "profile.release.strip = false" --release --target "${MACOS_TARGET}"
