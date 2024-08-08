@@ -1,0 +1,85 @@
+ ---------------------------------------------------------------------------------------------
+# Copyright (C) ygguser 2024.
+# https://github.com/ygguser
+#
+# Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
+# ---------------------------------------------------------------------------------------------
+
+name: Build & Release (drwn)
+
+on:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  get_version:
+    name: Get version from Cargo.toml
+    runs-on: ubuntu-latest
+    outputs:
+      release_version: ${{ env.VERSION }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Getting version
+        run: echo "VERSION=$(sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml | tr -d '\"')" >> $GITHUB_ENV
+        
+  create_release_draft:
+    name: Create the release draft
+    runs-on: ubuntu-latest
+    outputs:
+      release_id: ${{ steps.create-release-draft.outputs.id }}
+    needs: get_version
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+
+      - name: Create release draft
+        id: create-release-draft
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.get_version.outputs.release_version }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          release_name: Peers updater v. ${{ env.VERSION }}
+          draft: true
+          prerelease: false
+          body: ${{ steps.extract-release-notes.outputs.release_notes }}
+
+  build_and_upload:
+    name: Create and upload binaries
+    needs: [ create_release_draft ]
+    runs-on: macos-12
+    strategy:
+      matrix:
+        target: [ x86_64-apple-darwin ]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Preparing for cross-compilation (darwin)
+        if: ${{contains(matrix.target, 'darwin')}}
+        run: |
+          rustup update
+          rustup target add x86_64-apple-darwin
+          
+      - name: Build and compress binaries (darwin)
+        if: ${{contains(matrix.target, 'darwin')}}
+        run: .github/workflows/build+zip_drwn3.sh ${{ matrix.target }} 
+
+      - name: Add archives to the release draft
+        uses: xresloader/upload-to-github-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+        with:
+          release_id: ${{ env.RELEASE_ID }}
+          file: "${{ github.workspace }}/target/*/release/*.zip"
+          draft: true
