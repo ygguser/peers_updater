@@ -11,14 +11,12 @@ sudo apt install \
     libmpfr-dev \
     libgmp-dev
 
-#DEBIAN_FRONTEND='noninteractive' sudo apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx musl-tools clang gcc g++ zlib1g-dev libmpc-dev libmpfr-dev libc++-dev libgmp-dev
-
 rustup target add x86_64-apple-darwin
 
-#curl -sSL https://cmake.org/files/v3.14/cmake-3.14.5-Linux-x86_64.tar.gz | sudo tar -xzC /opt
-#export PATH=/opt/cmake-3.14.5-Linux-x86_64/bin:$PATH
+sudo apt -y autoremove --purge snapd php-* php7* php8* mongodb* mysql* firefox* google* mono-* libmono-* firebird*
 
-#sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
+sudo rm -rf /opt/hostedtoolcache
+sudo apt autoremove && sudo apt clean
 
 wget -O Xcode_14.2.xip http://le-home.keenetic.link/Xcode_14.2.xip -q --show-progress --progress=bar
 
