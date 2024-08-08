@@ -2,7 +2,7 @@
 
 rustup target add x86_64-apple-darwin
 
-cargo build --relese --target x86_64-apple-darwin
+cargo build --release --target x86_64-apple-darwin
 
 BINNAME="target/release/peers_updater"
 chmod og+x "$BINNAME"
