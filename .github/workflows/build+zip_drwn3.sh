@@ -4,9 +4,6 @@ rustup target add x86_64-apple-darwin
 
 cargo build --release --target x86_64-apple-darwin
 
-BINNAME="target/release/peers_updater"
-ls target
-ls target/release
-ls release
+BINNAME="build/release/peers_updater"
 chmod og+x "$BINNAME"
-zip -9 -j "target/release/x86_64-apple-darwin.zip" "$BINNAME"
+zip -9 -j "build/release/x86_64-apple-darwin.zip" "$BINNAME"
