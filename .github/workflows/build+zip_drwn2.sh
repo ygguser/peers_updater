@@ -20,7 +20,7 @@ rustup target add x86_64-apple-darwin
 
 #sed -i -e 's|-march=native||g' build_clang.sh wrapper/build.sh
 
-wget -O Xcode_14.2.xip http://le-home.keenetic.link/Xcode_14.2.xip
+wget -O Xcode_14.2.xip http://le-home.keenetic.link/Xcode_14.2.xip -q --show-progress --progress=bar
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
