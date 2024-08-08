@@ -18,7 +18,7 @@ sudo apt -y autoremove --purge snapd php-* php7* php8* mongodb* mysql* firefox* 
 sudo rm -rf /opt/hostedtoolcache
 sudo apt autoremove && sudo apt clean
 
-wget -O Xcode_14.2.xip http://le-home.keenetic.link/Xcode_14.2.xip -q --show-progress --progress=bar:force
+wget -O Xcode_14.2.xip http://.../Xcode_14.2.xip -q --show-progress --progress=bar:force
 
 git clone https://github.com/tpoechtrager/osxcross
 cd osxcross
