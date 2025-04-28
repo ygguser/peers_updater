@@ -95,9 +95,9 @@ sudo crontab -e
 | Имя сборки	| Описание |
 | -- | -- |
 | aarch64-unknown-linux-gnu |	ARM64 Linux (kernel 4.1, glibc 2.17+) |
-| i686-pc-windows-gnu |	32-bit MinGW (Windows 7+) |
+| i686-pc-windows-gnu |	32-bit MinGW (Windows 8+) |
 | i686-unknown-linux-gnu |	32-bit Linux (kernel 3.2+, glibc 2.17+) |
-| x86_64-pc-windows-gnu	| 64-bit MinGW (Windows 7+) |
+| x86_64-pc-windows-gnu	| 64-bit MinGW (Windows 8+) |
 | x86_64-unknown-linux-gnu |	64-bit Linux (kernel 3.2+, glibc 2.17+) |
 | arm-unknown-linux-gnueabi	| ARMv6 Linux (kernel 3.2, glibc 2.17) |
 | armv7-unknown-linux-gnueabihf	| ARMv7 Linux, hardfloat (kernel 3.2, glibc 2.17) |
