@@ -106,7 +106,7 @@ Download links for peers_updater for the desired architecture are available on t
 
 #### Build from source
 
-The project is being built without errors and warnings with cargo 1.65.0 and rustc 1.65.0.
+The project is being built without errors and warnings with cargo 1.80 and rustc 1.80.
 
 Just install rust, `git` (on Linux may also be needed `gcc-multilib`) and do the following: 
 
