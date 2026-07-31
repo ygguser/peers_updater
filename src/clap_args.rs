@@ -49,22 +49,30 @@ pub fn build_args() -> clap::ArgMatches {
                 -u --update_cfg "Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file."
             )
             .required(false)
-        )
-        .arg(
+        );
+    }
+
+    #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
+    {
+        app = app.arg(
             arg!(
                 -r --restart "Restart the Yggdrasil (systemd or windows) service"
             )
-            .required(false)
+            .required(false),
         );
     }
 
     #[cfg(feature = "using_api")]
     {
         app = app.arg(
-            arg!(
-                -a --api "Add/remove peers during execution (requires enabling the admin API)"
-            )
-            .required(false),
+            Arg::new("api")
+                .short('a')
+                .long("api")
+                .default_missing_value("")
+                .value_name("SOCKET_ADDR")
+                .help("Add/remove peers during execution using admin API. Optionally accepts an admin socket endpoint URI (priority: CLI argument → AdminListen → platform defaults)")
+                .required(false)
+                .value_parser(value_parser!(String)),
         );
     }
 

@@ -182,14 +182,14 @@ fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usiz
     cur_pos
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "updating_cfg"))]
 mod tests {
     use super::*;
 
     #[test]
     fn test_find_peers_section_1() {
         let cfg_txt = "{
-            #commets
+            #comments
             Peers: [
                 tcp://some.peer.uri:34589
                 quic://another.peer.uri:55555 #comment
@@ -303,7 +303,7 @@ mod tests {
     #[test]
     fn test_find_peers_section_5() {
         let cfg_txt = "{
-            #commets
+            #comments
             #Peers:
             #[
             #  tcp://some.peer.uri:34589
