@@ -12,18 +12,18 @@ By setting up the automatic launch of the utility on a schedule, you can forget 
 Usage: peers_updater [OPTIONS]
 
 Options:
-  -p, --print           Print the peers sorted by latency
-  -c, --config <FILE>   The path to the Yggdrasil configuration file [default: /etc/yggdrasil/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
-  -u, --update_cfg      Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
-  -a, --api             Add/remove peers during execution (requires enabling the admin API)
-  -n, --number <VALUE>  The number of peers to add (excluding extra ones) [default: 3]
-  -e, --extra <VALUE>   A space-separated string with the URIs of the peers that should always be in the configuration
-  -i, --ignore <VALUE>  A space-separated string of characters. Peers whose URIs contain combinations of characters will not be added to the configuration
+  -p, --print             Print the peers sorted by latency
+  -c, --config <FILE>     The path to the Yggdrasil configuration file [default: /etc/yggdrasil/yggdrasil.conf or C:\ProgramData\Yggdrasil\yggdrasil.conf]
+  -u, --update_cfg        Make changes to the Yggdrasil configuration file. If not specified, no changes will be made to the file.
+  -a, --api <SOCKET_ADDR> Add/remove peers during execution using admin API. Optionally accepts an admin socket endpoint URI (priority: CLI argument → AdminListen → platform defaults)
+  -n, --number <VALUE>    The number of peers to add (excluding extra ones) [default: 3]
+  -e, --extra <VALUE>     A space-separated string with the URIs of the peers that should always be in the configuration
+  -i, --ignore <VALUE>    A space-separated string of characters. Peers whose URIs contain combinations of characters will not be added to the configuration
   -I, --ignore_country <VALUE> A space-separated string containing the names of countries that will not be added to the configuration
-  -r, --restart         Restart the Yggdrasil (systemd or windows) service
-  -S, --self_update     Self-updating of this utility. An executable file will be downloaded from the releases on GitHub (if a newer version is published there) and the current one will be replaced with a new one.
-  -h, --help            Print help information
-  -V, --version         Print version information
+  -r, --restart           Restart the Yggdrasil (systemd or windows) service
+  -S, --self_update       Self-updating of this utility. An executable file will be downloaded from the releases on GitHub (if a newer version is published there) and the current one will be replaced with a new one.
+  -h, --help              Print help information
+  -V, --version           Print version information
 ```
 
 To simply display a list of peers sorted by response time, use the `-p` parameter (no changes will be made to the configuration of Yggrasil).
