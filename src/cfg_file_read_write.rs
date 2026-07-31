@@ -182,7 +182,7 @@ fn find_end_of_peers_fragment(chars: &Vec<char>, from: usize, to: usize) -> usiz
     cur_pos
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "updating_cfg"))]
 mod tests {
     use super::*;
 

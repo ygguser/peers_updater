@@ -47,10 +47,14 @@ fn main() {
         false
     };
 
-    let use_api = if cfg!(feature = "using_api") {
-        matches.get_flag("api")
+    #[allow(unused_variables)]
+    let (use_api, socket_addr) = if cfg!(feature = "using_api") {
+        match matches.get_one::<String>("api") {
+            Some(addr) => (true, if !addr.is_empty() { Some(addr) } else { None }),
+            _ => (false, None)
+        }
     } else {
-        false
+        (false, None)
     };
 
     if !(print_only || update_cfg || use_api) {
@@ -69,23 +73,51 @@ fn main() {
         }
     };
 
-    #[cfg(feature = "updating_cfg")]
-    if update_cfg {
+    #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
+    const EMPTY_CFG: &str = "{}";
+
+    #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
+    let cfg_txt = if update_cfg || use_api {
         // Checking if the file exists
         if !conf_path.exists() {
-            eprintln!("The Yggdrasil configuration file does not exist.");
-            process::exit(1);
-        }
+            // For `--update_cfg`, the config file is required so always warn and exit on errors
+            if update_cfg {
+                eprintln!("The Yggdrasil configuration file does not exist.");
+                process::exit(1);
+            }
 
-        // Checking write access to the configuration file
-        if let Err(e) = check_permissions(conf_path) {
-            eprintln!(
-                "There is no write access to the Yggdrasil configuration file ({}).",
-                e
-            );
-            process::exit(1);
+            // For `--api`, it is optional so substitute an empty config without warning
+            EMPTY_CFG.to_owned()
+        } else {
+            // Checking write access to the configuration file
+            #[cfg(feature = "updating_cfg")]
+            if update_cfg {
+                if let Err(e) = check_permissions(conf_path) {
+                    eprintln!(
+                        "There is no write access to the Yggdrasil configuration file ({}).",
+                        e
+                    );
+                    process::exit(1);
+                }
+            }
+
+            //Reading the configuration file (or failing) early
+            match cfg_file_read_write::read_config(conf_path) {
+                Ok(_ct) => _ct,
+                Err(e) => {
+                    // If the config file exists but cannot be read, warn in both cases but only exit if `--update_cfg`
+                    eprintln!("The configuration file cannot be read ({}).", e);
+                    if update_cfg {
+                        process::exit(1);
+                    }
+
+                    EMPTY_CFG.to_owned()
+                }
+            }
         }
-    }
+    } else {
+        EMPTY_CFG.to_owned()
+    };
 
     // Creating a temporary directory
     let tmp_dir = match tmpdir::create_tmp_dir(None) {
@@ -196,16 +228,7 @@ fn main() {
                 }
             };
 
-            //Reading the configuration file
-            let cfg_txt = match cfg_file_read_write::read_config(conf_path) {
-                Ok(_ct) => _ct,
-                Err(e) => {
-                    eprintln!("The configuration file cannot be read ({}).", e);
-                    process::exit(1);
-                }
-            };
-
-            let exrta_peers: Option<&String> = matches.get_one("extra");
+            let extra_peers: Option<&String> = matches.get_one("extra");
 
             // Adding peers to the configuration file
             #[cfg(feature = "updating_cfg")]
@@ -214,12 +237,13 @@ fn main() {
                     &peers,
                     conf_path,
                     n_peers,
-                    exrta_peers,
+                    extra_peers,
                     &cfg_txt,
                 );
             }
 
             //Restart if required
+            #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
             if matches.get_flag("restart") {
                 #[cfg(not(target_os = "windows"))]
                 let _ = std::process::Command::new("systemctl")
@@ -252,7 +276,12 @@ fn main() {
                     }
                 };
 
-                using_api::update_peers(&peers, &mut conf_obj, n_peers, exrta_peers);
+                // If an API socket address was provided with `--api`, replace the one in the configuration
+                if let Some(addr) = socket_addr {
+                    conf_obj.insert("AdminListen".into(), nu_json::Value::String(addr.to_owned()));
+                }
+
+                using_api::update_peers(&peers, &mut conf_obj, n_peers, extra_peers);
             }
         }
     }
