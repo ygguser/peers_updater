@@ -2,7 +2,7 @@ use clap::arg;
 
 #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
 use {
-    clap::{value_parser, Arg},
+    clap::{Arg, value_parser},
     std::path::PathBuf,
 };
 

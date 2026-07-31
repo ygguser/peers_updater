@@ -47,15 +47,14 @@ fn main() {
         false
     };
 
-    #[allow(unused_variables)]
-    let (use_api, socket_addr) = if cfg!(feature = "using_api") {
-        match matches.get_one::<String>("api") {
-            Some(addr) => (true, if !addr.is_empty() { Some(addr) } else { None }),
-            _ => (false, None),
-        }
-    } else {
-        (false, None)
+    #[cfg(feature = "using_api")]
+    let (use_api, socket_addr) = match matches.get_one::<String>("api") {
+        Some(addr) => (true, (!addr.is_empty()).then_some(addr)),
+        None => (false, None),
     };
+
+    #[cfg(not(feature = "using_api"))]
+    let use_api = false;
 
     if !(print_only || update_cfg || use_api) {
         println!("At least the `-p` option is expected.");
