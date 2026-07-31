@@ -32,24 +32,20 @@ fn collect_files(
         let path = entry.path();
         let metadata = std::fs::metadata(&path)?;
         if metadata.is_file() {
+            
             let country = match path.file_stem() {
-                Some(_c) => match _c.to_str() {
-                    Some(_co) => _co,
-                    _ => "Unknown",
-                },
-                _ => "Unknown",
+                  Some(c) => c.to_str().unwrap_or("Unknown"),
+                  None => "Unknown",
             };
 
             if ignored_countries.contains(&country) {
                 continue;
             }
 
+
             let region = match dir.file_stem() {
-                Some(_r) => match _r.to_str() {
-                    Some(_reg) => _reg,
-                    _ => "Unknown",
-                },
-                _ => "Unknown",
+                Some(r) => r.to_str().unwrap_or("Unknown"),
+                None => "Unknown",
             };
 
             file_patches.push(PPFile::new(&path, region, country));
@@ -88,7 +84,7 @@ pub fn collect_peers(
     for pp_file in pp_files {
         // Reading a file
         if let Ok(lines) = read_lines(pp_file.path) {
-            for line in lines.into_iter().flatten() {
+            for line in lines.map_while(Result::ok) {
                 for peer_ in re.captures_iter(line.as_str()) {
                     let uri = match peer_.get(0) {
                         Some(_u) => _u.as_str(),
