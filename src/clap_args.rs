@@ -68,6 +68,7 @@ pub fn build_args() -> clap::ArgMatches {
             Arg::new("api")
                 .short('a')
                 .long("api")
+                .num_args(0..=1)
                 .default_missing_value("")
                 .value_name("SOCKET_ADDR")
                 .help("Add/remove peers during execution using admin API. Optionally accepts an admin socket endpoint URI (priority: CLI argument → AdminListen → platform defaults)")
