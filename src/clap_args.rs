@@ -58,7 +58,7 @@ pub fn build_args() -> clap::ArgMatches {
             arg!(
                 -r --restart "Restart the Yggdrasil (systemd or windows) service"
             )
-            .required(false)
+            .required(false),
         );
     }
 
