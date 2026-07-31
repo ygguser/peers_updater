@@ -51,7 +51,7 @@ fn main() {
     let (use_api, socket_addr) = if cfg!(feature = "using_api") {
         match matches.get_one::<String>("api") {
             Some(addr) => (true, if !addr.is_empty() { Some(addr) } else { None }),
-            _ => (false, None)
+            _ => (false, None),
         }
     } else {
         (false, None)
@@ -278,7 +278,10 @@ fn main() {
 
                 // If an API socket address was provided with `--api`, replace the one in the configuration
                 if let Some(addr) = socket_addr {
-                    conf_obj.insert("AdminListen".into(), nu_json::Value::String(addr.to_owned()));
+                    conf_obj.insert(
+                        "AdminListen".into(),
+                        nu_json::Value::String(addr.to_owned()),
+                    );
                 }
 
                 using_api::update_peers(&peers, &mut conf_obj, n_peers, extra_peers);
