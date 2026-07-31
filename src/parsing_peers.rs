@@ -32,16 +32,14 @@ fn collect_files(
         let path = entry.path();
         let metadata = std::fs::metadata(&path)?;
         if metadata.is_file() {
-            
             let country = match path.file_stem() {
-                  Some(c) => c.to_str().unwrap_or("Unknown"),
-                  None => "Unknown",
+                Some(c) => c.to_str().unwrap_or("Unknown"),
+                None => "Unknown",
             };
 
             if ignored_countries.contains(&country) {
                 continue;
             }
-
 
             let region = match dir.file_stem() {
                 Some(r) => r.to_str().unwrap_or("Unknown"),
