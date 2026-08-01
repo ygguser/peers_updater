@@ -1,4 +1,4 @@
-use std::net::{TcpStream, ToSocketAddrs};
+use std::net::{Shutdown, TcpStream, ToSocketAddrs};
 use std::string::String;
 use std::time;
 
@@ -63,6 +63,9 @@ impl Peer {
         };
         self.is_alive = true;
         self.latency = now.elapsed().as_millis();
+
+        let _ = stream.shutdown(Shutdown::Both);
+
         drop(stream);
     }
 }
