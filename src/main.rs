@@ -197,21 +197,65 @@ fn main() {
     peers.sort_by(|a, b| a.latency.cmp(&b.latency));
 
     // Printing data
+    //if print_only {
+    //    println!(
+    //        "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
+    //        "URI", "Region", "Country", "Latency"
+    //    );
+    //    println!("{0:-<100}", "-");
+    //    for peer in peers {
+    //        if !peer.is_alive {
+    //            break;
+    //        }
+    //        println!(
+    //            "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
+    //            peer.uri, peer.region, peer.country, peer.latency
+    //        );
+    //    }
+    //    process::exit(0);
+    // Printing data
     if print_only {
+        let uri_width = peers
+            .iter()
+            .take_while(|p| p.is_alive)
+            .map(|p| p.uri.len())
+            .max()
+            .unwrap_or(3)
+            .max(3);
+
         println!(
-            "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
-            "URI", "Region", "Country", "Latency"
+            "{:<uri_width$} | {:<15} | {:<15} | {:>7}",
+            "URI",
+            "Region",
+            "Country",
+            "Latency",
+            uri_width = uri_width,
         );
-        println!("{0:-<100}", "-");
+
+        println!(
+            "{:-<uri_width$}-+-{:-<15}-+-{:-<15}-+-{:-<7}",
+            "",
+            "",
+            "",
+            "",
+            uri_width = uri_width,
+        );
+
         for peer in peers {
             if !peer.is_alive {
                 break;
             }
+
             println!(
-                "{0:<60}|{1:<15}|{2:<15}|{3:<10}",
-                peer.uri, peer.region, peer.country, peer.latency
+                "{:<uri_width$} | {:<15} | {:<15} | {:>7}",
+                peer.uri,
+                peer.region,
+                peer.country,
+                peer.latency,
+                uri_width = uri_width,
             );
         }
+
         process::exit(0);
     } else if update_cfg || use_api {
         #[cfg(any(feature = "updating_cfg", feature = "using_api"))]

@@ -25,6 +25,17 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.5] - 2026-08-01
+
+### Changed
+- `--api` command line argument accepts an optional admin API endpoint string
+- Removed the regex dependency, slightly reducing the binary size.
+
+### Fixed
+- Previously, the node URI was truncated to `proto://host:port`, now the full URI will always be used.
+  For example: it used to be `quic://host.eu:8888`, now it will be: `quic://host.eu:8888?key=ec56fa43b8c9e71c1fe31832b87653f23166f2bac12d52c755d9ac68f55dbc46`
+- Fixed various Clippy warnings.
+
 ## [0.3.4] - 2024-08-06
 
 ### Added

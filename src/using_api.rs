@@ -229,6 +229,17 @@ fn get_connection(sock_addr: &SockAddr) -> Connection {
     };
 }
 
+fn parse_socket_uri(uri: &str) -> Option<(&str, &str)> {
+    let rest = uri
+        .strip_prefix("tcp://")
+        .or_else(|| uri.strip_prefix("tls://"))
+        .or_else(|| uri.strip_prefix("quic://"))?;
+
+    let pos = rest.rfind(':')?;
+
+    Some((&rest[..pos], &rest[pos + 1..]))
+}
+
 fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     //Extract value from conf_obj
     let mut _t_sa: String;
@@ -253,39 +264,11 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     } else {
         //tcp
         //Parsing the URI of the admin socket
-        let re = match regex::Regex::new(r"(tcp|tls|quic)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
-            Ok(_r) => _r,
-            Err(e) => {
-                eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
-                std::process::exit(1);
-            }
-        };
-        let mut cap_iter = re.captures_iter(string_addr.as_str());
-        let cap = match cap_iter.next() {
-            Some(_c) => _c,
+
+        let (host, port) = match parse_socket_uri(&string_addr) {
+            Some(v) => v,
             None => {
                 eprintln!("Unable to parse socket URI ({}).", string_addr);
-                return SockAddr::None;
-            }
-        };
-
-        let host = match cap.get(2) {
-            Some(_h) => _h.as_str(),
-            None => {
-                eprintln!(
-                    "Unable to parse socket URI (failed to get host from URI ({})).",
-                    string_addr
-                );
-                return SockAddr::None;
-            }
-        };
-        let port = match cap.get(3) {
-            Some(_p) => _p.as_str(),
-            None => {
-                eprintln!(
-                    "Unable to parse socket URI (failed to get port from URI ({})).",
-                    string_addr
-                );
                 return SockAddr::None;
             }
         };
