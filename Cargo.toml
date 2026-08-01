@@ -1,7 +1,7 @@
 [package]
 name = "peers_updater"
-version = "0.3.4"
-edition = "2024"
+version = "0.3.5"
+edition = "2021"
 authors = ["YggUser (https://matrix.to/#/@ygguser:matrix.org)"]
 readme = "README.md"
 repository = "https://github.com/ygguser/peers_updater"
@@ -10,8 +10,6 @@ repository = "https://github.com/ygguser/peers_updater"
 
 [dependencies]
 clap = { version = "4.1.6", default-features = false, features = [
-    "suggestions",
-    "usage",
     "help",
     "std",
 ] }
@@ -30,7 +28,7 @@ minreq = { version = "2.6.0", default-features = false, features = ["https"] }
 [profile.release]
 strip = true
 opt-level = "z"
-lto = true
+lto = "fat"
 codegen-units = 1
 panic = "abort"
 
