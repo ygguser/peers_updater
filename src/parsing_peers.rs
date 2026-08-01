@@ -56,7 +56,6 @@ fn collect_files(
 }
 
 fn parse_peer_uri(uri: &str) -> Option<(&str, &str)> {
-    // Removing the scheme
     let rest = uri
         .strip_prefix("tcp://")
         .or_else(|| uri.strip_prefix("tls://"))
@@ -64,11 +63,9 @@ fn parse_peer_uri(uri: &str) -> Option<(&str, &str)> {
         .or_else(|| uri.strip_prefix("ws://"))
         .or_else(|| uri.strip_prefix("wss://"))?;
 
-    // Separating the authority from path/query/fragment
     let end = rest.find(&['/', '?', '#'][..]).unwrap_or(rest.len());
     let authority = &rest[..end];
 
-    // IPv6: [2001:db8::1]:1234
     if authority.starts_with('[') {
         let close = authority.find(']')?;
 
@@ -86,7 +83,6 @@ fn parse_peer_uri(uri: &str) -> Option<(&str, &str)> {
         return Some((host, port));
     }
 
-    // IPv4 or hostname
     let pos = authority.rfind(':')?;
 
     let host = &authority[..pos];
@@ -109,7 +105,16 @@ pub fn collect_peers(
     ignored_peers_str: &str,
     ignored_countries_str: &str,
 ) -> io::Result<bool> {
-    const SCHEMES: [&str; 5] = [
+    let ignored_peers: Vec<&str> = ignored_peers_str.split(' ').collect();
+    let ignored_countries: Vec<&str> = ignored_countries_str.split(' ').collect();
+
+    let mut pp_files: Vec<PPFile> = Vec::with_capacity(30);
+    if let Err(e) = collect_files(path, &mut pp_files, &ignored_countries) {
+        eprintln!("Failed to collect *.md files ({}).", e);
+        process::exit(1);
+    }
+
+    const PREFIXES: [&str; 5] = [
         "tcp://",
         "tls://",
         "quic://",
@@ -117,43 +122,40 @@ pub fn collect_peers(
         "wss://",
     ];
 
-    let ignored_peers: Vec<&str> = ignored_peers_str.split(' ').collect();
-    let ignored_countries: Vec<&str> = ignored_countries_str.split(' ').collect();
-
-    let mut pp_files: Vec<PPFile> = Vec::with_capacity(30);
-
-    if let Err(e) = collect_files(path, &mut pp_files, &ignored_countries) {
-        eprintln!("Failed to collect *.md files ({}).", e);
-        process::exit(1);
-    }
-
     for pp_file in pp_files {
         if let Ok(lines) = read_lines(pp_file.path) {
             for line in lines.map_while(Result::ok) {
                 let mut pos = 0;
 
                 while pos < line.len() {
-                    // Looking for the nearest URI scheme
-                    let mut found: Option<usize> = None;
+                    let mut start = None;
 
-                    for scheme in SCHEMES {
-                        if let Some(idx) = line[pos..].find(scheme) {
-                            let abs = pos + idx;
-                            found = match found {
-                                Some(cur) if cur < abs => Some(cur),
+                    for p in PREFIXES {
+                        if let Some(i) = line[pos..].find(p) {
+                            let abs = pos + i;
+                            start = match start {
+                                Some(old) if old < abs => Some(old),
                                 _ => Some(abs),
                             };
                         }
                     }
 
-                    let start = match found {
-                        Some(v) => v,
+                    let start = match start {
+                        Some(s) => s,
                         None => break,
                     };
 
-                    // URI ends at whitespace or end of line
                     let rest = &line[start..];
-                    let end = rest.find(char::is_whitespace).unwrap_or(rest.len());
+
+                    let end = rest
+                        .find(|c: char| {
+                            c.is_whitespace()
+                                || c == '`'
+                                || c == ')'
+                                || c == ','
+                                || c == ';'
+                        })
+                        .unwrap_or(rest.len());
 
                     let uri = &rest[..end];
 
@@ -165,10 +167,8 @@ pub fn collect_peers(
                     };
 
                     let mut skip = false;
-
                     for ig in &ignored_peers {
                         let ig = ig.trim_matches('"');
-
                         if !ig.is_empty() && uri.contains(ig) {
                             skip = true;
                             break;
