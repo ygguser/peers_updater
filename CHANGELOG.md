@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
-## [0.3.5] - 2026-08-01
+## [0.3.5] - 2026-08-02
 
 ### Changed
 - `--api` command line argument accepts an optional admin API endpoint string
