@@ -63,10 +63,14 @@ jobs:
       steps:
       - name: Checkout code
         uses: actions/checkout@v3    
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.97.1'
       
       - name: Preparing for cross-compilation (x86_64-apple-darwin)
         run: |
-          rustup update
           rustup target add x86_64-apple-darwin
              
       - name: Build and compress binaries (x86_64-apple-darwin)
@@ -131,19 +135,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.97.1'
  
       - name: Preparing for cross-compilation (arm)
         if: ${{contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi')}}
         run: |
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip gcc-arm-linux-gnueabihf
-          rustup update
           cargo install --force --locked cross
 
       - name: Preparing for cross-compilation (other)         
         if: ${{!contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin')}}
         run: |
           sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip gcc-aarch64-linux-gnu
-          rustup update
           cargo install --force --locked cross
           
       - name: Build and compress binaries (other)
