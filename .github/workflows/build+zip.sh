@@ -14,7 +14,7 @@ if [[ "$1" == *"windows"* ]]; then
 else
     BINNAME="target/$1/release/peers_updater"
     chmod og+x "$BINNAME"
-    upx --ultra-brute "$BINNAME"
+    #upx --ultra-brute "$BINNAME"
 fi
 
 zip -9 -j "target/$1/release/$1.zip" "$BINNAME"
