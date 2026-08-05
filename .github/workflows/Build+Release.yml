@@ -16,7 +16,7 @@ env:
 jobs:
   get_version:
     name: Get version from Cargo.toml
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       release_version: ${{ env.VERSION }}
     steps:
@@ -92,7 +92,7 @@ jobs:
   build_and_upload_linux_unknown:
       name: Create and upload binaries (x86_64-unknown-linux-gnu)
       needs: [ create_release_draft ]
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
       strategy:
         matrix:
           target: [ x86_64-unknown-linux-gnu ]
@@ -128,7 +128,7 @@ jobs:
   build_and_upload:
     name: Create and upload binaries
     needs: [ create_release_draft ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
         target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
