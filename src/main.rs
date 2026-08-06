@@ -201,8 +201,8 @@ fn main() {
                 .unwrap_or(&prio_lowest)
                 .cmp(proto_prio.get(&b.proto).unwrap_or(&prio_lowest))
         });
-        peers.sort_by_key(|p| p.addr.clone());
-        peers.dedup_by_key(|p| p.addr.clone());
+        peers.sort_by(|a, b| a.addr.cmp(&b.addr));
+        peers.dedup_by(|a, b| a.addr == b.addr);
     }
 
     // Calculating latency
