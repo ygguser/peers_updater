@@ -28,7 +28,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ## [0.3.5] - 2026-08-02
 
 ### Changed
-- `--api` command line argument accepts an optional admin API endpoint string (#35)
+- `--api` command line argument accepts an optional admin API endpoint string (ygguser/peers_updater#35)
 
 ### Fixed
 - Previously, the node URI was truncated to `proto://host:port`, now the full URI will always be used.
@@ -36,7 +36,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 - Fixed various Clippy warnings.
 
 ### Contributors
-- @Liniya — `--api` command line argument accepts an optional admin API endpoint string
+- [@Liniya](https://github.com/Liniya) — `--api` command line argument accepts an optional admin API endpoint string
 
 ## [0.3.4] - 2024-08-06
 
