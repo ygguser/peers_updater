@@ -3,6 +3,7 @@ use crate::peer::Peer;
 #[cfg(feature = "using_api")]
 use nu_json::Map;
 
+use std::collections::HashMap;
 use std::fs;
 use std::path::PathBuf;
 use std::process;
@@ -183,6 +184,26 @@ fn main() {
 
     // Deleting unnecessary files
     let _ = fs::remove_dir_all(std::path::Path::new(tmp_dir.as_path()));
+
+    // Deduplicate peers
+    if let Some(protos) = matches.get_many::<String>("dedup") {
+        let proto_prio: HashMap<String, usize> = protos
+            .filter(|&u| !u.is_empty())
+            .enumerate()
+            .map(|(i, u)| (u.to_lowercase(), i))
+            .collect();
+
+        let prio_lowest = proto_prio.len();
+
+        peers.sort_by(|a, b| {
+            proto_prio
+                .get(&a.proto)
+                .unwrap_or(&prio_lowest)
+                .cmp(proto_prio.get(&b.proto).unwrap_or(&prio_lowest))
+        });
+        peers.sort_by_key(|p| p.addr.clone());
+        peers.dedup_by_key(|p| p.addr.clone());
+    }
 
     // Calculating latency
     std::thread::scope(|scope| {

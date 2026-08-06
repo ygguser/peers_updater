@@ -1,10 +1,7 @@
-use clap::arg;
+use clap::{arg, value_parser, Arg};
 
 #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
-use {
-    clap::{Arg, value_parser},
-    std::path::PathBuf,
-};
+use std::path::PathBuf;
 
 pub fn build_args() -> clap::ArgMatches {
     let mut app = clap::Command::new("Yggdrasil peers updater")
@@ -114,6 +111,19 @@ pub fn build_args() -> clap::ArgMatches {
             .required(false)
         );
     }
+
+    app = app.arg(
+        Arg::new("dedup")
+            .short('d')
+            .long("dedup")
+            .value_delimiter(',')
+            .num_args(0..)
+            .default_missing_value("")
+            .value_name("PROTO")
+            .help("Deduplicate peers by address. Accepts an optional comma-separated list of protocols in order of priority.")
+            .required(false)
+            .value_parser(value_parser!(String)),
+    );
 
     app.get_matches()
 }
