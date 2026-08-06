@@ -1,4 +1,4 @@
-use clap::{value_parser, Arg};
+use clap::{arg, value_parser, Arg};
 
 #[cfg(any(feature = "updating_cfg", feature = "using_api"))]
 use std::path::PathBuf;
