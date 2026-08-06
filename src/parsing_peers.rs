@@ -64,7 +64,7 @@ pub fn collect_peers(
 ) -> io::Result<bool> {
     //let re = match Regex::new(r"(tcp|tls|quic|ws|wss)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
     let re = match Regex::new(
-        r"((tcp|tls|quic|ws|wss)://(\[[^\]]+\]|[^:/ \t\r\n`]+):([0-9]+)([^ \t\r\n`]*))",
+        r"(((?i-u:tcp|tls|quic|ws|wss))://(\[[^\]]+\]|[^:/ \t\r\n`]+):([0-9]+)([^ \t\r\n`]*))",
     ) {
         Ok(_r) => _r,
         Err(e) => {
