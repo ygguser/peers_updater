@@ -7,7 +7,7 @@ pub struct Peer {
     pub uri: String,
     pub addr: String,
     pub port: String,
-    //proto: String,
+    pub proto: String,
     pub region: String,
     pub country: String,
     pub is_alive: bool,
@@ -16,20 +16,20 @@ pub struct Peer {
 
 impl Peer {
     pub fn new(
-        uri: &str,
-        addr: &str,
-        port: &str,
-        //proto: String,
+        uri: String,
+        addr: String,
+        port: String,
+        proto: String,
         region: String,
         country: String,
         is_alive: bool,
         latency: u128,
     ) -> Self {
         Peer {
-            uri: String::from(uri),
-            addr: String::from(addr),
-            port: String::from(port),
-            //proto,
+            uri,
+            addr,
+            port,
+            proto,
             region,
             country,
             is_alive,

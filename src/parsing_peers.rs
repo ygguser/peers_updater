@@ -64,7 +64,7 @@ pub fn collect_peers(
 ) -> io::Result<bool> {
     //let re = match Regex::new(r"(tcp|tls|quic|ws|wss)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
     let re = match Regex::new(
-        r"((?:tcp|tls|quic|ws|wss)://(\[[^\]]+\]|[^:/ \t\r\n`]+):([0-9]+)[^ \t\r\n`]*)",
+        r"((tcp|tls|quic|ws|wss)://(\[[^\]]+\]|[^:/ \t\r\n`]+):([0-9]+)([^ \t\r\n`]*))",
     ) {
         Ok(_r) => _r,
         Err(e) => {
@@ -87,7 +87,7 @@ pub fn collect_peers(
         if let Ok(lines) = read_lines(pp_file.path) {
             for line in lines.map_while(Result::ok) {
                 for peer_ in re.captures_iter(line.as_str()) {
-                    let uri = match peer_.get(0) {
+                    let uri = match peer_.get(1) {
                         Some(_u) => _u.as_str(),
                         None => {
                             continue;
@@ -103,13 +103,24 @@ pub fn collect_peers(
                     if skip {
                         continue;
                     }
+
+                    // Normalize case
+                    let get_match = |idx| peer_.get(idx).map_or("", |m| m.as_str());
+
+                    let (proto, addr, port, path) = (
+                        get_match(2).to_lowercase(),
+                        get_match(3).to_lowercase(),
+                        get_match(4).to_owned(),
+                        get_match(5),
+                    );
+
+                    let uri = format!("{}://{}:{}{}", proto, addr, port, path);
+
                     v.push(Peer::new(
                         uri,
-                        peer_.get(2).map_or("", |m| m.as_str()),
-                        peer_.get(3).map_or("", |m| m.as_str()),
-                        // peer_
-                        //     .get(1)
-                        //     .map_or("".to_string(), |m| m.as_str().to_string()),
+                        addr,
+                        port,
+                        proto,
                         pp_file.region.to_owned(),
                         pp_file.country.to_owned(),
                         false,

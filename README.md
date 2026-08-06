@@ -22,6 +22,7 @@ Options:
   -I, --ignore_country <VALUE> A space-separated string containing the names of countries that will not be added to the configuration
   -r, --restart           Restart the Yggdrasil (systemd or windows) service
   -S, --self_update       Self-updating of this utility. An executable file will be downloaded from the releases on GitHub (if a newer version is published there) and the current one will be replaced with a new one.
+  -d, --dedup [<PROTO>...] Deduplicate peers by address. Accepts an optional comma-separated list of protocols in order of priority.
   -h, --help              Print help information
   -V, --version           Print version information
 ```
