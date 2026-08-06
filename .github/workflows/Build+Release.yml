@@ -16,7 +16,7 @@ env:
 jobs:
   get_version:
     name: Get version from Cargo.toml
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     outputs:
       release_version: ${{ env.VERSION }}
     steps:
@@ -54,7 +54,7 @@ jobs:
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
 
   build_and_upload_drwn:
-      name: Create and upload binaries (darwin)
+      name: Create and upload binaries (x86_64-apple-darwin)
       needs: [ create_release_draft ]
       runs-on: macos-15
       strategy:
@@ -63,19 +63,18 @@ jobs:
       steps:
       - name: Checkout code
         uses: actions/checkout@v3    
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.97.1'
       
-      - name: Preparing for cross-compilation (darwin)
+      - name: Preparing for cross-compilation (x86_64-apple-darwin)
         run: |
-          rustup update
           rustup target add x86_64-apple-darwin
-          #rustup target add x86_64h-apple-darwin
-          #rustup +nightly component add rust-src
-          #cargo +nightly build -Z build-std --target x86_64h-apple-darwin
-   
-      - name: Build and compress binaries (darwin)
-        if: ${{contains(matrix.target, 'darwin')}}
+             
+      - name: Build and compress binaries (x86_64-apple-darwin)
         run: |
-         #.github/workflows/build+zip_drwn2.sh ${{ matrix.target }} 
          cargo build --release --target x86_64-apple-darwin
          chmod og+x "target/x86_64-apple-darwin/release/peers_updater"
          zip -9 -j "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" "target/x86_64-apple-darwin/release/peers_updater"   
@@ -90,42 +89,69 @@ jobs:
           file: "${{ github.workspace }}/target/*/release/*.zip"
           draft: true
           
+  build_and_upload_linux_unknown:
+      name: Create and upload binaries (x86_64-unknown-linux-gnu)
+      needs: [ create_release_draft ]
+      runs-on: ubuntu-22.04
+      strategy:
+        matrix:
+          target: [ x86_64-unknown-linux-gnu ]
+      steps:
+      - name: Checkout code
+        uses: actions/checkout@v3    
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.97.1' 
+      
+      - name: Preparing for cross-compilation (x86_64-unknown-linux-gnu)
+        run: |
+          rustup target add x86_64-unknown-linux-gnu
+             
+      - name: Build and compress binaries (x86_64-unknown-linux-gnu)
+        run: |
+         cargo build --release --target x86_64-unknown-linux-gnu
+         chmod og+x "target/x86_64-unknown-linux-gnu/release/peers_updater"
+         zip -9 -j "target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip" "target/x86_64-unknown-linux-gnu/release/peers_updater"   
+
+      - name: Add archives to the release draft
+        uses: xresloader/upload-to-github-release@main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+        with:
+          release_id: ${{ env.RELEASE_ID }}
+          file: "${{ github.workspace }}/target/*/release/*.zip"
+          draft: true
+          
   build_and_upload:
     name: Create and upload binaries
     needs: [ create_release_draft ]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     strategy:
       matrix:
-        target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, x86_64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
+        target: [ i686-unknown-linux-gnu, aarch64-unknown-linux-gnu, arm-unknown-linux-gnueabi, i686-pc-windows-gnu, x86_64-pc-windows-gnu, armv7-unknown-linux-gnueabihf ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.97.1'
  
       - name: Preparing for cross-compilation (arm)
         if: ${{contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi')}}
         run: |
-          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-arm-linux-gnueabihf
-          rustup update
-          #rustup component add rust-src
-          #rustup toolchain install nightly
-          #rustup component add rust-src --toolchain nightly
+          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip gcc-arm-linux-gnueabihf
           cargo install --force --locked cross
-          #rustup toolchain install nightly-2023-02-15-x86_64-unknown-linux-gnu
-          #rustup component add rust-src --toolchain nightly-2023-02-15-x86_64-unknown-linux-gnu
-          #mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu
 
       - name: Preparing for cross-compilation (other)         
         if: ${{!contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin')}}
         run: |
-          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip upx gcc-aarch64-linux-gnu
-          rustup update
-          #rustup component add rust-src
-          #rustup toolchain install nightly
-          #rustup component add rust-src --toolchain nightly
+          sudo apt update && sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade && sudo apt-get -y install zip gcc-aarch64-linux-gnu
           cargo install --force --locked cross
-          #rustup toolchain install nightly-2023-02-15-x86_64-unknown-linux-gnu
-          #rustup component add rust-src --toolchain nightly-2023-02-15-x86_64-unknown-linux-gnu
-          #mv ~/.rustup/toolchains/nightly-2023-02-15-x86_64-unknown-linux-gnu ~/.rustup/toolchains/nightly-x86_64-unknown-linux-gnu  
           
       - name: Build and compress binaries (other)
         if: ${{!contains(matrix.target, 'darwin')}}
