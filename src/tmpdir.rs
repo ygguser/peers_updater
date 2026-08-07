@@ -32,7 +32,7 @@ pub fn create_tmp_dir(in_dir: Option<&Path>) -> Result<PathBuf, std::io::Error> 
     if std::fs::create_dir_all(&tmp_dir_path).is_err() {
         eprintln!(
             "Failed to create a temporary directory ({}).",
-            &tmp_dir_path.display()
+            tmp_dir_path.display()
         );
         std::process::exit(1);
     };

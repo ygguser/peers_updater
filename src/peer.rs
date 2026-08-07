@@ -15,6 +15,7 @@ pub struct Peer {
 }
 
 impl Peer {
+    #[allow(clippy::too_many_arguments)]
     pub fn new(
         uri: String,
         addr: String,

@@ -147,17 +147,17 @@ fn main() {
 
     // Deleting unnecessary files
     let _ = fs::remove_file(std::path::Path::new(
-        format!("{}/public-peers-master/README.md", &tmp_dir.display()).as_str(),
+        format!("{}/public-peers-master/README.md", tmp_dir.display()).as_str(),
     ));
     let _ = fs::remove_file(std::path::Path::new(
-        format!("{}/peers.zip", &tmp_dir.display()).as_str(),
+        format!("{}/peers.zip", tmp_dir.display()).as_str(),
     ));
     let _ = fs::remove_dir_all(std::path::Path::new(
-        format!("{}/public-peers-master/other", &tmp_dir.display()).as_str(),
+        format!("{}/public-peers-master/other", tmp_dir.display()).as_str(),
     ));
 
     let peers_dir: PathBuf =
-        std::path::Path::new(format!("{}/public-peers-master/", &tmp_dir.display()).as_str())
+        std::path::Path::new(format!("{}/public-peers-master/", tmp_dir.display()).as_str())
             .to_path_buf();
 
     let ignored_peers: &str = match matches.get_one::<String>("ignore") {
@@ -215,7 +215,7 @@ fn main() {
     });
 
     //Sorting the vector
-    peers.sort_by(|a, b| a.latency.cmp(&b.latency));
+    peers.sort_by_key(|a| a.latency);
 
     // Printing data
     if print_only {

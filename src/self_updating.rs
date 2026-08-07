@@ -74,7 +74,7 @@ pub fn self_update() {
 
     println!(
         "New release found: {} --> {}",
-        &current_version_str, &latest_version_gh.tag_name
+        current_version_str, latest_version_gh.tag_name
     );
 
     println!("Downloading...");
@@ -106,7 +106,7 @@ pub fn self_update() {
 
     // Deleting zip file
     let _ = std::fs::remove_file(std::path::Path::new(
-        format!("{}/{}", &tmp_dir.display(), fname).as_str(),
+        format!("{}/{}", tmp_dir.display(), fname).as_str(),
     ));
 
     println!("Replacing binary file...");
@@ -124,11 +124,11 @@ pub fn self_update() {
 
     #[cfg(not(target_os = "windows"))]
     let tmp_exec_file_name =
-        std::path::Path::new(format!("{}/{}", &tmp_dir.display(), "peers_updater_old").as_str())
+        std::path::Path::new(format!("{}/{}", tmp_dir.display(), "peers_updater_old").as_str())
             .to_path_buf();
     #[cfg(not(target_os = "windows"))]
     let new_file = std::path::Path::new(
-        format!("{}/{}", &tmp_dir.display(), crate::defaults::EXE_NAME).as_str(),
+        format!("{}/{}", tmp_dir.display(), crate::defaults::EXE_NAME).as_str(),
     )
     .to_path_buf();
 
