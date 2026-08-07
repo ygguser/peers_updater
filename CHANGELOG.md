@@ -25,6 +25,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.6] - 2026-08-07
+
+### Added
+- Added `--dedup`: peer deduplication by address/IP (ygguser/peers_updater#40)
+
+### Contributors
+
+- [@Liniya](https://github.com/Liniya) —  Added `--dedup`: peer deduplication by address/IP
+
 ## [0.3.5] - 2026-08-02
 
 ### Changed
@@ -37,6 +46,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Contributors
 - [@Liniya](https://github.com/Liniya) — `--api` command line argument accepts an optional admin API endpoint string
+- [@Ygguser](https://://github.com/ygguser) — using the full URI
 
 ## [0.3.4] - 2024-08-06
 
