@@ -44,6 +44,7 @@ jobs:
 
     outputs:
       release_id: ${{ steps.create-release.outputs.release_id }}
+      upload_url: ${{ steps.create-release.outputs.upload_url }}
 
     steps:
       - name: Checkout
@@ -60,16 +61,25 @@ jobs:
           VERSION: ${{ needs.get_version.outputs.release_version }}
           RELEASE_NOTES: ${{ steps.extract-release-notes.outputs.release_notes }}
         run: |
-          RELEASE_ID=$(gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases" \
+          RELEASE=$(gh api \
+            --method POST \
+            "/repos/${GITHUB_REPOSITORY}/releases" \
             --field "tag_name=${VERSION}" \
             --field "name=Peers updater v. ${VERSION}" \
             --field "body=${RELEASE_NOTES}" \
             --field "draft=true" \
-            --field "prerelease=false" \
-            --jq '.id')
+            --field "prerelease=false")
 
-          echo "Created release with ID: ${RELEASE_ID}"
+          RELEASE_ID=$(echo "$RELEASE" | jq -r '.id')
+
+          UPLOAD_URL=$(echo "$RELEASE" | jq -r '.upload_url' | sed 's/{?name,label}//')
+
+          echo "Created release:"
+          echo "  ID: ${RELEASE_ID}"
+          echo "  Upload URL: ${UPLOAD_URL}"
+
           echo "release_id=${RELEASE_ID}" >> "$GITHUB_OUTPUT"
+          echo "upload_url=${UPLOAD_URL}" >> "$GITHUB_OUTPUT"
 
 
   build_and_upload_drwn:
@@ -101,16 +111,23 @@ jobs:
       - name: Build and compress binaries (x86_64-apple-darwin)
         run: |
           cargo build --release --target x86_64-apple-darwin
-          chmod og+x "target/x86_64-apple-darwin/release/peers_updater"
-          zip -9 -j "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" "target/x86_64-apple-darwin/release/peers_updater"
+
+          chmod og+x \
+            "target/x86_64-apple-darwin/release/peers_updater"
+
+          zip -9 -j \
+            "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" \
+            "target/x86_64-apple-darwin/release/peers_updater"
 
       - name: Upload archive to GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
           FILE: ${{ github.workspace }}/target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip
         run: |
-          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
             --header "Content-Type: application/zip" \
             --input "$FILE"
 
@@ -144,16 +161,23 @@ jobs:
       - name: Build and compress binaries (x86_64-unknown-linux-gnu)
         run: |
           cargo build --release --target x86_64-unknown-linux-gnu
-          chmod og+x "target/x86_64-unknown-linux-gnu/release/peers_updater"
-          zip -9 -j "target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip" "target/x86_64-unknown-linux-gnu/release/peers_updater"
+
+          chmod og+x \
+            "target/x86_64-unknown-linux-gnu/release/peers_updater"
+
+          zip -9 -j \
+            "target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip" \
+            "target/x86_64-unknown-linux-gnu/release/peers_updater"
 
       - name: Upload archive to GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
           FILE: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip
         run: |
-          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
             --header "Content-Type: application/zip" \
             --input "$FILE"
 
@@ -189,22 +213,32 @@ jobs:
         if: ${{ contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi') }}
         run: |
           sudo apt update
+
           sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
             -o Dpkg::Options::='--force-confdef' \
             -o Dpkg::Options::='--force-confold' \
             upgrade
-          sudo apt-get -y install zip gcc-arm-linux-gnueabihf
+
+          sudo apt-get -y install \
+            zip \
+            gcc-arm-linux-gnueabihf
+
           cargo install --force --locked cross
 
       - name: Preparing for cross-compilation (other)
         if: ${{ !contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin') }}
         run: |
           sudo apt update
+
           sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
             -o Dpkg::Options::='--force-confdef' \
             -o Dpkg::Options::='--force-confold' \
             upgrade
-          sudo apt-get -y install zip gcc-aarch64-linux-gnu
+
+          sudo apt-get -y install \
+            zip \
+            gcc-aarch64-linux-gnu
+
           cargo install --force --locked cross
 
       - name: Build and compress binaries (other)
@@ -215,10 +249,12 @@ jobs:
       - name: Upload archive to GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
           FILE: ${{ github.workspace }}/target/${{ matrix.target }}/release/${{ matrix.target }}.zip
         run: |
-          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
             --header "Content-Type: application/zip" \
             --input "$FILE"
 
@@ -262,7 +298,12 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt update
-          sudo apt-get install -y dpkg-dev gcc-aarch64-linux-gnu gcc-arm-linux-gnueabi gcc-arm-linux-gnueabihf
+
+          sudo apt-get install -y \
+            dpkg-dev \
+            gcc-aarch64-linux-gnu \
+            gcc-arm-linux-gnueabi \
+            gcc-arm-linux-gnueabihf
 
       - name: Install cross
         run: |
@@ -285,13 +326,20 @@ jobs:
           mkdir -p "$PACKAGE_DIR/DEBIAN"
           mkdir -p "$PACKAGE_DIR/opt/peers_updater"
 
-          cp "target/${TARGET}/release/peers_updater" "$PACKAGE_DIR/opt/peers_updater/peers_updater"
+          cp \
+            "target/${TARGET}/release/peers_updater" \
+            "$PACKAGE_DIR/opt/peers_updater/peers_updater"
 
-          chmod 755 "$PACKAGE_DIR/opt/peers_updater/peers_updater"
+          chmod 755 \
+            "$PACKAGE_DIR/opt/peers_updater/peers_updater"
 
-          cp .github/workflows/packaging/postinst "$PACKAGE_DIR/DEBIAN/postinst"
+          cp \
+            .github/workflows/packaging/postinst \
+            "$PACKAGE_DIR/DEBIAN/postinst"
 
-          cp .github/workflows/packaging/prerm "$PACKAGE_DIR/DEBIAN/prerm"
+          cp \
+            .github/workflows/packaging/prerm \
+            "$PACKAGE_DIR/DEBIAN/prerm"
 
           chmod 755 "$PACKAGE_DIR/DEBIAN/postinst"
           chmod 755 "$PACKAGE_DIR/DEBIAN/prerm"
@@ -312,9 +360,11 @@ jobs:
       - name: Upload Debian package to GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
           FILE: ${{ github.workspace }}/peers_updater_${{ needs.get_version.outputs.release_version }}_${{ matrix.deb_arch }}.deb
         run: |
-          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
             --header "Content-Type: application/vnd.debian.binary-package" \
             --input "$FILE"
