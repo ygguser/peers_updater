@@ -82,209 +82,72 @@ jobs:
           echo "upload_url=${UPLOAD_URL}" >> "$GITHUB_OUTPUT"
 
 
-  build_and_upload_drwn:
-    name: Create and upload binaries (x86_64-apple-darwin)
-
-    needs:
-      - create_release_draft
-
-    runs-on: macos-15
-
-    strategy:
-      matrix:
-        target:
-          - x86_64-apple-darwin
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: '1.97.1'
-
-      - name: Preparing for cross-compilation (x86_64-apple-darwin)
-        run: |
-          rustup target add x86_64-apple-darwin
-
-      - name: Build and compress binaries (x86_64-apple-darwin)
-        run: |
-          cargo build --release --target x86_64-apple-darwin
-
-          chmod og+x \
-            "target/x86_64-apple-darwin/release/peers_updater"
-
-          zip -9 -j \
-            "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" \
-            "target/x86_64-apple-darwin/release/peers_updater"
-
-      - name: Upload archive to GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
-          FILE: ${{ github.workspace }}/target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip
-        run: |
-          gh api \
-            --method POST \
-            "${UPLOAD_URL}?name=$(basename "$FILE")" \
-            --header "Content-Type: application/zip" \
-            --input "$FILE"
-
-
-  build_and_upload_linux_unknown:
-    name: Create and upload binaries (x86_64-unknown-linux-gnu)
-
-    needs:
-      - create_release_draft
-
-    runs-on: ubuntu-22.04
-
-    strategy:
-      matrix:
-        target:
-          - x86_64-unknown-linux-gnu
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: '1.97.1'
-
-      - name: Preparing for cross-compilation (x86_64-unknown-linux-gnu)
-        run: |
-          rustup target add x86_64-unknown-linux-gnu
-
-      - name: Build and compress binaries (x86_64-unknown-linux-gnu)
-        run: |
-          cargo build --release --target x86_64-unknown-linux-gnu
-
-          chmod og+x \
-            "target/x86_64-unknown-linux-gnu/release/peers_updater"
-
-          zip -9 -j \
-            "target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip" \
-            "target/x86_64-unknown-linux-gnu/release/peers_updater"
-
-      - name: Upload archive to GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
-          FILE: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip
-        run: |
-          gh api \
-            --method POST \
-            "${UPLOAD_URL}?name=$(basename "$FILE")" \
-            --header "Content-Type: application/zip" \
-            --input "$FILE"
-
-
-  build_and_upload_others:
-    name: Create and upload binaries
-
-    needs:
-      - create_release_draft
-
-    runs-on: ubuntu-22.04
-
-    strategy:
-      matrix:
-        target:
-          - i686-unknown-linux-gnu
-          - aarch64-unknown-linux-gnu
-          - arm-unknown-linux-gnueabi
-          - i686-pc-windows-gnu
-          - x86_64-pc-windows-gnu
-          - armv7-unknown-linux-gnueabihf
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Install Rust toolchain
-        uses: dtolnay/rust-toolchain@master
-        with:
-          toolchain: '1.97.1'
-
-      - name: Preparing for cross-compilation (arm)
-        if: ${{ contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi') }}
-        run: |
-          sudo apt update
-
-          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
-            -o Dpkg::Options::='--force-confdef' \
-            -o Dpkg::Options::='--force-confold' \
-            upgrade
-
-          sudo apt-get -y install \
-            zip \
-            gcc-arm-linux-gnueabihf
-
-          cargo install --force --locked cross
-
-      - name: Preparing for cross-compilation (other)
-        if: ${{ !contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin') }}
-        run: |
-          sudo apt update
-
-          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
-            -o Dpkg::Options::='--force-confdef' \
-            -o Dpkg::Options::='--force-confold' \
-            upgrade
-
-          sudo apt-get -y install \
-            zip \
-            gcc-aarch64-linux-gnu
-
-          cargo install --force --locked cross
-
-      - name: Build and compress binaries (other)
-        if: ${{ !contains(matrix.target, 'darwin') }}
-        run: |
-          .github/workflows/build+zip.sh ${{ matrix.target }}
-
-      - name: Upload archive to GitHub release
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
-          FILE: ${{ github.workspace }}/target/${{ matrix.target }}/release/${{ matrix.target }}.zip
-        run: |
-          gh api \
-            --method POST \
-            "${UPLOAD_URL}?name=$(basename "$FILE")" \
-            --header "Content-Type: application/zip" \
-            --input "$FILE"
-
-
-  build_deb:
-    name: Build Debian package (${{ matrix.deb_arch }})
+  build:
+    name: Build ${{ matrix.target }}
 
     needs:
       - get_version
       - create_release_draft
 
-    runs-on: ubuntu-22.04
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
+
       matrix:
         include:
+
+          # -----------------------------------------------------------------
+          # macOS
+          # -----------------------------------------------------------------
+
+          - target: x86_64-apple-darwin
+            os: macos-15
+            deb_arch: ''
+            use_cross: false
+
+          # -----------------------------------------------------------------
+          # Linux
+          # -----------------------------------------------------------------
+
           - target: x86_64-unknown-linux-gnu
+            os: ubuntu-22.04
             deb_arch: amd64
+            use_cross: true
 
           - target: i686-unknown-linux-gnu
+            os: ubuntu-22.04
             deb_arch: i386
+            use_cross: true
 
           - target: aarch64-unknown-linux-gnu
+            os: ubuntu-22.04
             deb_arch: arm64
+            use_cross: true
 
           - target: arm-unknown-linux-gnueabi
+            os: ubuntu-22.04
             deb_arch: armel
+            use_cross: true
 
           - target: armv7-unknown-linux-gnueabihf
+            os: ubuntu-22.04
             deb_arch: armhf
+            use_cross: true
+
+          # -----------------------------------------------------------------
+          # Windows
+          # -----------------------------------------------------------------
+
+          - target: i686-pc-windows-gnu
+            os: ubuntu-22.04
+            deb_arch: ''
+            use_cross: true
+
+          - target: x86_64-pc-windows-gnu
+            os: ubuntu-22.04
+            deb_arch: ''
+            use_cross: true
 
     steps:
       - name: Checkout code
@@ -295,31 +158,110 @@ jobs:
         with:
           toolchain: '1.97.1'
 
-      - name: Install build dependencies
-        run: |
-          sudo apt update
+      # ---------------------------------------------------------------------
+      # macOS
+      # ---------------------------------------------------------------------
 
-          sudo apt-get install -y \
-            dpkg-dev \
-            gcc-aarch64-linux-gnu \
-            gcc-arm-linux-gnueabi \
-            gcc-arm-linux-gnueabihf
+      - name: Add Rust target
+        if: ${{ !matrix.use_cross }}
+        run: |
+          rustup target add "${{ matrix.target }}"
+
+      # ---------------------------------------------------------------------
+      # Linux / Windows cross-compilation
+      # ---------------------------------------------------------------------
 
       - name: Install cross
+        if: ${{ matrix.use_cross }}
         run: |
           cargo install --force --locked cross
+
+      # ---------------------------------------------------------------------
+      # Debian package tools
+      # ---------------------------------------------------------------------
+
+      - name: Install Debian package tools
+        if: ${{ matrix.deb_arch != '' }}
+        run: |
+          sudo apt update
+          sudo apt-get install -y dpkg-dev
+
+      # ---------------------------------------------------------------------
+      # Build
+      # ---------------------------------------------------------------------
 
       - name: Build binary
         env:
           TARGET: ${{ matrix.target }}
         run: |
-          cross build --release --target "$TARGET"
+          if [[ "${{ matrix.use_cross }}" == "true" ]]; then
+            cross build \
+              --locked \
+              --release \
+              --target "$TARGET"
+          else
+            cargo build \
+              --locked \
+              --release \
+              --target "$TARGET"
+          fi
+
+      # ---------------------------------------------------------------------
+      # Determine binary name
+      # ---------------------------------------------------------------------
+
+      - name: Set binary path
+        id: binary
+        env:
+          TARGET: ${{ matrix.target }}
+        run: |
+          if [[ "$TARGET" == *"windows"* ]]; then
+            echo "path=target/$TARGET/release/peers_updater.exe" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=target/$TARGET/release/peers_updater" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ---------------------------------------------------------------------
+      # Prepare executable
+      # ---------------------------------------------------------------------
+
+      - name: Set executable permission
+        if: ${{ !contains(matrix.target, 'windows') }}
+        env:
+          BINARY: ${{ steps.binary.outputs.path }}
+        run: |
+          chmod og+x "$BINARY"
+
+      # ---------------------------------------------------------------------
+      # Create ZIP
+      # ---------------------------------------------------------------------
+
+      - name: Install zip
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          sudo apt update
+          sudo apt-get install -y zip
+
+      - name: Create ZIP archive
+        env:
+          TARGET: ${{ matrix.target }}
+          BINARY: ${{ steps.binary.outputs.path }}
+        run: |
+          zip -9 -j \
+            "target/$TARGET/release/$TARGET.zip" \
+            "$BINARY"
+
+      # ---------------------------------------------------------------------
+      # Create Debian package
+      # ---------------------------------------------------------------------
 
       - name: Prepare Debian package
+        if: ${{ matrix.deb_arch != '' }}
         env:
           VERSION: ${{ needs.get_version.outputs.release_version }}
           TARGET: ${{ matrix.target }}
           DEB_ARCH: ${{ matrix.deb_arch }}
+          BINARY: ${{ steps.binary.outputs.path }}
         run: |
           PACKAGE_DIR="peers_updater_${VERSION}_${DEB_ARCH}"
 
@@ -327,7 +269,7 @@ jobs:
           mkdir -p "$PACKAGE_DIR/opt/peers_updater"
 
           cp \
-            "target/${TARGET}/release/peers_updater" \
+            "$BINARY" \
             "$PACKAGE_DIR/opt/peers_updater/peers_updater"
 
           chmod 755 \
@@ -357,7 +299,28 @@ jobs:
 
           dpkg-deb --build "$PACKAGE_DIR"
 
+      # ---------------------------------------------------------------------
+      # Upload ZIP
+      # ---------------------------------------------------------------------
+
+      - name: Upload ZIP to GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
+          FILE: ${{ github.workspace }}/target/${{ matrix.target }}/release/${{ matrix.target }}.zip
+        run: |
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
+            --header "Content-Type: application/zip" \
+            --input "$FILE"
+
+      # ---------------------------------------------------------------------
+      # Upload Debian package
+      # ---------------------------------------------------------------------
+
       - name: Upload Debian package to GitHub release
+        if: ${{ matrix.deb_arch != '' }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
