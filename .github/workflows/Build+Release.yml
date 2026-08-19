@@ -13,10 +13,14 @@ on:
 env:
   CARGO_TERM_COLOR: always
 
+permissions:
+  contents: write
+
 jobs:
   get_version:
     name: Get version from Cargo.toml
     runs-on: ubuntu-22.04
+
     outputs:
       release_version: ${{ steps.get-version.outputs.version }}
 
@@ -30,13 +34,16 @@ jobs:
           VERSION=$(sed -nE 's/^version\s*=\s*(\S*)$/\1/p' Cargo.toml | tr -d '"')
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
 
+
   create_release_draft:
     name: Create the release draft
     runs-on: ubuntu-latest
-    outputs:
-      release_id: ${{ steps.create-release-draft.outputs.id }}
 
-    needs: get_version
+    needs:
+      - get_version
+
+    outputs:
+      release_id: ${{ steps.create-release.outputs.release_id }}
 
     steps:
       - name: Checkout
@@ -47,25 +54,36 @@ jobs:
         uses: ffurrer2/extract-release-notes@v1
 
       - name: Create release draft
-        id: create-release-draft
-        uses: actions/create-release@v1
+        id: create-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.get_version.outputs.release_version }}
-          release_name: Peers updater v. ${{ needs.get_version.outputs.release_version }}
-          draft: true
-          prerelease: false
-          body: ${{ steps.extract-release-notes.outputs.release_notes }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.get_version.outputs.release_version }}
+          RELEASE_NOTES: ${{ steps.extract-release-notes.outputs.release_notes }}
+        run: |
+          RELEASE_ID=$(gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases" \
+            --field "tag_name=${VERSION}" \
+            --field "name=Peers updater v. ${VERSION}" \
+            --field "body=${RELEASE_NOTES}" \
+            --field "draft=true" \
+            --field "prerelease=false" \
+            --jq '.id')
+
+          echo "Created release with ID: ${RELEASE_ID}"
+          echo "release_id=${RELEASE_ID}" >> "$GITHUB_OUTPUT"
+
 
   build_and_upload_drwn:
     name: Create and upload binaries (x86_64-apple-darwin)
-    needs: [ create_release_draft ]
+
+    needs:
+      - create_release_draft
+
     runs-on: macos-15
 
     strategy:
       matrix:
-        target: [ x86_64-apple-darwin ]
+        target:
+          - x86_64-apple-darwin
 
     steps:
       - name: Checkout code
@@ -86,24 +104,29 @@ jobs:
           chmod og+x "target/x86_64-apple-darwin/release/peers_updater"
           zip -9 -j "target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip" "target/x86_64-apple-darwin/release/peers_updater"
 
-      - name: Add archives to the release draft
-        uses: xresloader/upload-to-github-release@main
+      - name: Upload archive to GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
-        with:
-          release_id: ${{ env.RELEASE_ID }}
-          file: "${{ github.workspace }}/target/*/release/*.zip"
-          draft: true
+          FILE: ${{ github.workspace }}/target/x86_64-apple-darwin/release/x86_64-apple-darwin.zip
+        run: |
+          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+            --header "Content-Type: application/zip" \
+            --input "$FILE"
+
 
   build_and_upload_linux_unknown:
     name: Create and upload binaries (x86_64-unknown-linux-gnu)
-    needs: [ create_release_draft ]
+
+    needs:
+      - create_release_draft
+
     runs-on: ubuntu-22.04
 
     strategy:
       matrix:
-        target: [ x86_64-unknown-linux-gnu ]
+        target:
+          - x86_64-unknown-linux-gnu
 
     steps:
       - name: Checkout code
@@ -124,19 +147,23 @@ jobs:
           chmod og+x "target/x86_64-unknown-linux-gnu/release/peers_updater"
           zip -9 -j "target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip" "target/x86_64-unknown-linux-gnu/release/peers_updater"
 
-      - name: Add archives to the release draft
-        uses: xresloader/upload-to-github-release@main
+      - name: Upload archive to GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
-        with:
-          release_id: ${{ env.RELEASE_ID }}
-          file: "${{ github.workspace }}/target/*/release/*.zip"
-          draft: true
+          FILE: ${{ github.workspace }}/target/x86_64-unknown-linux-gnu/release/x86_64-unknown-linux-gnu.zip
+        run: |
+          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+            --header "Content-Type: application/zip" \
+            --input "$FILE"
+
 
   build_and_upload_others:
     name: Create and upload binaries
-    needs: [ create_release_draft ]
+
+    needs:
+      - create_release_draft
+
     runs-on: ubuntu-22.04
 
     strategy:
@@ -162,7 +189,10 @@ jobs:
         if: ${{ contains(matrix.target, 'armv7-unknown-linux-gnueabihf') || contains(matrix.target, 'arm-unknown-linux-gnueabi') }}
         run: |
           sudo apt update
-          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
+          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
+            -o Dpkg::Options::='--force-confdef' \
+            -o Dpkg::Options::='--force-confold' \
+            upgrade
           sudo apt-get -y install zip gcc-arm-linux-gnueabihf
           cargo install --force --locked cross
 
@@ -170,27 +200,36 @@ jobs:
         if: ${{ !contains(matrix.target, 'arm') && !contains(matrix.target, 'darwin') }}
         run: |
           sudo apt update
-          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y -o Dpkg::Options::='--force-confdef' -o Dpkg::Options::='--force-confold' upgrade
+          sudo DEBIAN_FRONTEND='noninteractive' apt-get -y \
+            -o Dpkg::Options::='--force-confdef' \
+            -o Dpkg::Options::='--force-confold' \
+            upgrade
           sudo apt-get -y install zip gcc-aarch64-linux-gnu
           cargo install --force --locked cross
 
       - name: Build and compress binaries (other)
         if: ${{ !contains(matrix.target, 'darwin') }}
-        run: .github/workflows/build+zip.sh ${{ matrix.target }}
+        run: |
+          .github/workflows/build+zip.sh ${{ matrix.target }}
 
-      - name: Add archives to the release draft
-        uses: xresloader/upload-to-github-release@main
+      - name: Upload archive to GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
-        with:
-          release_id: ${{ env.RELEASE_ID }}
-          file: "${{ github.workspace }}/target/*/release/*.zip"
-          draft: true
+          FILE: ${{ github.workspace }}/target/${{ matrix.target }}/release/${{ matrix.target }}.zip
+        run: |
+          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+            --header "Content-Type: application/zip" \
+            --input "$FILE"
+
 
   build_deb:
     name: Build Debian package (${{ matrix.deb_arch }})
-    needs: [ get_version, create_release_draft ]
+
+    needs:
+      - get_version
+      - create_release_draft
+
     runs-on: ubuntu-22.04
 
     strategy:
@@ -251,6 +290,7 @@ jobs:
           chmod 755 "$PACKAGE_DIR/opt/peers_updater/peers_updater"
 
           cp .github/workflows/packaging/postinst "$PACKAGE_DIR/DEBIAN/postinst"
+
           cp .github/workflows/packaging/prerm "$PACKAGE_DIR/DEBIAN/prerm"
 
           chmod 755 "$PACKAGE_DIR/DEBIAN/postinst"
@@ -269,12 +309,12 @@ jobs:
 
           dpkg-deb --build "$PACKAGE_DIR"
 
-      - name: Add Debian package to the release draft
-        uses: xresloader/upload-to-github-release@main
+      - name: Upload Debian package to GitHub release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_ID: ${{ needs.create_release_draft.outputs.release_id }}
-        with:
-          release_id: ${{ env.RELEASE_ID }}
-          file: "${{ github.workspace }}/peers_updater_*.deb"
-          draft: true
+          FILE: ${{ github.workspace }}/peers_updater_${{ needs.get_version.outputs.release_version }}_${{ matrix.deb_arch }}.deb
+        run: |
+          gh api --method POST "/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets?name=$(basename "$FILE")" \
+            --header "Content-Type: application/vnd.debian.binary-package" \
+            --input "$FILE"
