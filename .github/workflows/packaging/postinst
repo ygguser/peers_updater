@@ -1,0 +1,66 @@
+#!/bin/sh
+set -e
+
+INSTALL_DIR="/opt/peers_updater"
+BINARY="$INSTALL_DIR/peers_updater"
+
+mkdir -p "$INSTALL_DIR"
+chmod 755 "$BINARY"
+
+# Prefer systemd timer
+if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+
+    cat > /etc/systemd/system/peers-updater.service <<'EOF'
+[Unit]
+Description=Update Yggdrasil peers
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/opt/peers_updater/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf
+EOF
+
+    cat > /etc/systemd/system/peers-updater.timer <<'EOF'
+[Unit]
+Description=Weekly Yggdrasil peers update
+
+[Timer]
+OnCalendar=Sun *-*-* 00:00:00
+RandomizedDelaySec=1h
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+EOF
+
+    systemctl daemon-reload
+    systemctl enable --now peers-updater.timer
+
+    echo "peers_updater: weekly automatic update configured using systemd timer."
+
+# Fall back to cron
+elif command -v crontab >/dev/null 2>&1; then
+
+    CRON_JOB='0 0 * * 0 /opt/peers_updater/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf >/dev/null 2>&1'
+
+    CURRENT_CRONTAB="$(crontab -l 2>/dev/null || true)"
+
+    if ! printf '%s\n' "$CURRENT_CRONTAB" | grep -Fq '/opt/peers_updater/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf'; then
+        {
+            printf '%s\n' "$CURRENT_CRONTAB"
+            printf '%s\n' "$CRON_JOB"
+        } | crontab -
+    fi
+
+    echo "peers_updater: weekly automatic update configured using cron."
+
+else
+
+    echo "peers_updater: no cron or systemd-timers found."
+    echo "Automatic peer updates are not configured."
+    echo "Please install cron or systemd-timers and configure peers_updater manually."
+
+fi
+
+exit 0

@@ -1,0 +1,22 @@
+#!/bin/sh
+set -e
+
+# Remove systemd timer
+if command -v systemctl >/dev/null 2>&1 && [ -d /run/systemd/system ]; then
+    systemctl disable --now peers-updater.timer 2>/dev/null || true
+    systemctl daemon-reload 2>/dev/null || true
+fi
+
+rm -f /etc/systemd/system/peers-updater.service
+rm -f /etc/systemd/system/peers-updater.timer
+
+# Remove cron job
+if command -v crontab >/dev/null 2>&1; then
+    CURRENT_CRONTAB="$(crontab -l 2>/dev/null || true)"
+
+    printf '%s\n' "$CURRENT_CRONTAB" |
+        grep -Fv '/opt/peers_updater/peers_updater -u -n 3 -r -c /etc/yggdrasil/yggdrasil.conf' |
+        crontab - 2>/dev/null || true
+fi
+
+exit 0
