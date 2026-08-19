@@ -250,8 +250,8 @@ jobs:
 
           chmod 755 "$PACKAGE_DIR/opt/peers_updater/peers_updater"
 
-          cp packaging/postinst "$PACKAGE_DIR/DEBIAN/postinst"
-          cp packaging/prerm "$PACKAGE_DIR/DEBIAN/prerm"
+          cp .github/workflows/packaging/postinst "$PACKAGE_DIR/DEBIAN/postinst"
+          cp .github/workflows/packaging/prerm "$PACKAGE_DIR/DEBIAN/prerm"
 
           chmod 755 "$PACKAGE_DIR/DEBIAN/postinst"
           chmod 755 "$PACKAGE_DIR/DEBIAN/prerm"
