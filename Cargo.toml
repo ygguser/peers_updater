@@ -19,12 +19,7 @@ regex-lite = "0.1.9"
 
 zip = { version = "0.6.4", default-features = false, features = ["deflate"] }
 
-tiny_http_client = {
-    git = "https://github.com/ygguser/tiny_http_client",
-    #path = "/home/ygguser/rust/tiny_http_client",
-    features = ["own-cert-list"],
-#    tag = "v0.1.0"
-}
+tiny_http_client = { git = "https://github.com/ygguser/tiny_http_client", features = ["own-cert-list"] }
 
 [profile.release]
 strip = true
