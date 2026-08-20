@@ -1,5 +1,5 @@
 use crate::peer::Peer;
-use regex::Regex;
+use regex_lite::Regex;
 use std::fs::File;
 use std::io;
 use std::io::BufRead;

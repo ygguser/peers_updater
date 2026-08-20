@@ -143,16 +143,22 @@ pub fn self_update() {
 fn get_latest_version(
     target: &str,
 ) -> std::result::Result<GitHubVersion, Box<dyn std::error::Error>> {
-    let response =
-        minreq::get("https://api.github.com/repos/ygguser/peers_updater/releases/latest")
-            .with_header(
-                "User-Agent",
-                "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0",
-            )
-            .send()?;
+    let response = tiny_http_client::get_with_headers(
+        "https://api.github.com/repos/ygguser/peers_updater/releases/latest",
+        &[(
+            "User-Agent",
+            "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0",
+        )],
+    )?;
 
-    let obj: nu_json::Map<String, nu_json::Value> = match nu_json::from_str(response.as_str()?) {
-        Ok(_o) => _o,
+    if response.status != 200 {
+        return Err(format!("GitHub API returned HTTP {}", response.status).into());
+    }
+
+    let text = std::str::from_utf8(&response.body)?;
+
+    let obj: nu_json::Map<String, nu_json::Value> = match nu_json::from_str(text) {
+        Ok(o) => o,
         Err(e) => {
             eprintln!("Error converting a json string to an object ({}).", e);
             ::std::process::exit(1);

@@ -1,5 +1,6 @@
 use crate::peer::Peer;
 use nu_json::Map;
+use regex_lite::Regex;
 use std::net::{SocketAddr, TcpStream, ToSocketAddrs};
 #[cfg(not(target_os = "windows"))]
 use std::os::unix::net::UnixStream;
@@ -253,7 +254,7 @@ fn get_socket_addr(conf_obj: &mut Map<String, nu_json::Value>) -> SockAddr {
     } else {
         //tcp
         //Parsing the URI of the admin socket
-        let re = match regex::Regex::new(r"(tcp|tls|quic)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
+        let re = match Regex::new(r"(tcp|tls|quic)://([a-z0-9\.\-:\[\]]+):([0-9]+)") {
             Ok(_r) => _r,
             Err(e) => {
                 eprintln!("Failed to create an instance of the RegEx parser ({}).", e);
