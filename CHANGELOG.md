@@ -25,6 +25,13 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.7] - 2026-08-20
+
+### Changed
+
+- `minreq` replaced with a custom [tiny_http_client](https://github.com/ygguser/tiny_http_client). This eliminates the vulnerable `minreq` 2.6 dependency without significantly increasing the binary size compared to `minreq` 3.
+- `regex` replaced with `regex-lite`. Since not all of regex's functionality was required, this change slightly reduces the binary size.
+
 ## [0.3.6] - 2026-08-07
 
 ### Added
