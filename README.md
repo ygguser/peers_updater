@@ -144,6 +144,7 @@ Options:
   -p, --print                   Print the peers sorted by latency. When using this parameter, all other parameters will be ignored.
   -i, --ignore <VALUE>          A space-separated string of characters. Peers whose URIs contain combinations of this characters will not be added to the configuration
   -I, --ignore_country <VALUE>  A space-separated string containing the names of countries that will not be added to the configuration
+  -d, --dedup [<PROTO>...] Deduplicate peers by address. Accepts an optional comma-separated list of protocols in order of priority.
   -h, --help                    Print help
   -V, --version                 Print version
 ```
