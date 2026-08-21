@@ -511,7 +511,7 @@ dependencies = [
 [[package]]
 name = "tiny_http_client"
 version = "0.1.0"
-source = "git+https://github.com/ygguser/tiny_http_client#a40fc3e81affc252c13f13a7eac8e007458d03f8"
+source = "git+https://github.com/ygguser/tiny_http_client#496d07764da066748c457b9320fc48533c9fc2d4"
 dependencies = [
  "native-tls",
  "rustls",
