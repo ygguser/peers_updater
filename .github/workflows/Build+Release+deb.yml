@@ -5,7 +5,7 @@
 # Distributed under the MIT License (license terms are at http://opensource.org/licenses/MIT).
 # ---------------------------------------------------------------------------------------------
 
-name: Build & Release
+name: Build & Release (+deb)
 
 on:
   workflow_dispatch:
@@ -267,6 +267,54 @@ jobs:
             "$BINARY"
 
       # ---------------------------------------------------------------------
+      # Create Debian package
+      # ---------------------------------------------------------------------
+
+      - name: Prepare Debian package
+        if: ${{ matrix.deb_arch != '' }}
+        env:
+          VERSION: ${{ needs.get_version.outputs.release_version }}
+          TARGET: ${{ matrix.target }}
+          DEB_ARCH: ${{ matrix.deb_arch }}
+          BINARY: ${{ steps.binary.outputs.path }}
+        run: |
+          PACKAGE_DIR="peers_updater_${VERSION}_${DEB_ARCH}"
+
+          mkdir -p "$PACKAGE_DIR/DEBIAN"
+          mkdir -p "$PACKAGE_DIR/opt/peers_updater"
+
+          cp \
+            "$BINARY" \
+            "$PACKAGE_DIR/opt/peers_updater/peers_updater"
+
+          chmod 755 \
+            "$PACKAGE_DIR/opt/peers_updater/peers_updater"
+
+          cp \
+            .github/workflows/packaging/postinst \
+            "$PACKAGE_DIR/DEBIAN/postinst"
+
+          cp \
+            .github/workflows/packaging/prerm \
+            "$PACKAGE_DIR/DEBIAN/prerm"
+
+          chmod 755 "$PACKAGE_DIR/DEBIAN/postinst"
+          chmod 755 "$PACKAGE_DIR/DEBIAN/prerm"
+
+          cat > "$PACKAGE_DIR/DEBIAN/control" <<EOF
+          Package: peers-updater
+          Version: ${VERSION}
+          Section: net
+          Priority: optional
+          Architecture: ${DEB_ARCH}
+          Maintainer: YggUser
+          Description: Yggdrasil peer updater
+           Automatically updates Yggdrasil peer configuration.
+          EOF
+
+          dpkg-deb --build "$PACKAGE_DIR"
+
+      # ---------------------------------------------------------------------
       # Upload ZIP
       # ---------------------------------------------------------------------
 
@@ -280,4 +328,21 @@ jobs:
             --method POST \
             "${UPLOAD_URL}?name=$(basename "$FILE")" \
             --header "Content-Type: application/zip" \
+            --input "$FILE"
+
+      # ---------------------------------------------------------------------
+      # Upload Debian package
+      # ---------------------------------------------------------------------
+
+      - name: Upload Debian package to GitHub release
+        if: ${{ matrix.deb_arch != '' }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          UPLOAD_URL: ${{ needs.create_release_draft.outputs.upload_url }}
+          FILE: ${{ github.workspace }}/peers_updater_${{ needs.get_version.outputs.release_version }}_${{ matrix.deb_arch }}.deb
+        run: |
+          gh api \
+            --method POST \
+            "${UPLOAD_URL}?name=$(basename "$FILE")" \
+            --header "Content-Type: application/vnd.debian.binary-package" \
             --input "$FILE"
