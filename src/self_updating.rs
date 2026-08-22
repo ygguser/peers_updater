@@ -99,7 +99,7 @@ pub fn self_update() {
     println!("Extracting...");
 
     //Extracting
-    if let Err(e) = crate::unpack::unpack_archive(&tmp_dir, &fname) {
+    if let Err(e) = crate::unpack::unpack_archive(&tmp_dir, &fname, true) {
         eprintln!("Failed to unpack archive ({}).", e);
         ::std::process::exit(1);
     }

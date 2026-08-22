@@ -17,9 +17,9 @@ nu-json = { version = "0.84.0", default-features = false, optional = true }
 
 regex-lite = "0.1.9"
 
-zip = { version = "0.6.4", default-features = false, features = ["deflate"] }
+munzip = "0.1.2"
 
-tiny_http_client = { git = "https://github.com/ygguser/tiny_http_client", default-features = false, features = ["http-get", "linux-own-cert-list"] }
+tiny_http_client = { version = "0.1", default-features = false, features = ["http-get", "linux-own-cert-list"] }
 #tiny_http_client = { git = "https://github.com/ygguser/tiny_http_client", default-features = false, features = ["http-get", "linux-native-tls"] }
 #tiny_http_client = { path = "../tiny_http_client", default-features = false, features = ["http-get", "linux-own-cert-list"] }
 

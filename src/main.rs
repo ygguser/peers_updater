@@ -140,7 +140,7 @@ fn main() {
 
     // Unpacking the downloaded archive
     //let tmp_dir_ = PathBuf::from("/home/user/rust/peers_updater/target/debug/"); //test
-    if let Err(e) = crate::unpack::unpack_archive(&tmp_dir, "peers.zip") {
+    if let Err(e) = crate::unpack::unpack_archive(&tmp_dir, "peers.zip", false) {
         eprintln!("Failed to unpack archive ({}).", e);
         process::exit(1);
     }

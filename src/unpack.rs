@@ -1,35 +1,54 @@
 use std::fs;
-use std::path::Path;
+use std::io;
+use std::path::{Component, Path};
 
-pub fn unpack_archive(tmp_dir: &Path, fname: &str) -> std::io::Result<bool> {
-    let file = fs::File::open(format!("{}/{}", tmp_dir.display(), fname))?;
-    let mut archive = zip::ZipArchive::new(file)?;
+pub fn unpack_archive(tmp_dir: &Path, fname: &str, set_exec: bool) -> io::Result<bool> {
+    let archive_path = tmp_dir.join(fname);
+    let mut file = fs::File::open(archive_path)?;
 
-    for i in 0..archive.len() {
-        let mut file = archive.by_index(i)?;
-        let out_path = match file.enclosed_name() {
-            Some(path) => path.to_owned(),
-            None => continue,
-        };
-        let full_path = format!("{}/{}", tmp_dir.display(), out_path.display());
-        let out_path = std::path::Path::new(full_path.as_str());
-        if (*file.name()).ends_with('/') {
-            fs::create_dir_all(out_path)?;
-        } else {
-            if let Some(p) = out_path.parent() {
-                if !p.exists() {
-                    fs::create_dir_all(p)?;
-                }
-            }
-            let mut outfile = fs::File::create(out_path)?;
-            std::io::copy(&mut file, &mut outfile)?;
+    let archive = munzip::IterableArchive::new(&mut file)
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+
+    for entry in archive {
+        let mut entry = entry
+            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+
+        let filename = entry.filename();
+        let path = Path::new(&filename);
+
+        // Do not allow absolute paths or ".." components.
+        if path.is_absolute()
+            || path.components().any(|component| {
+                matches!(component, Component::ParentDir | Component::RootDir | Component::Prefix(_))
+            })
+        {
+            continue;
         }
 
-        #[cfg(unix)]
-        {
-            use std::os::unix::fs::PermissionsExt;
-            if let Some(mode) = file.unix_mode() {
-                fs::set_permissions(out_path, fs::Permissions::from_mode(mode))?;
+        let out_path = tmp_dir.join(path);
+
+        if filename.ends_with('/') {
+            fs::create_dir_all(&out_path)?;
+        } else {
+            if let Some(parent) = out_path.parent() {
+                fs::create_dir_all(parent)?;
+            }
+
+            let buffer = entry
+                .buffer()
+                .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+
+            fs::write(&out_path, buffer)?;
+
+            //Set executable permissions for self-update
+            #[cfg(unix)]
+            if set_exec {
+                use std::os::unix::fs::PermissionsExt;
+
+                fs::set_permissions(
+                    &out_path,
+                    fs::Permissions::from_mode(0o755),
+                )?;
             }
         }
     }
