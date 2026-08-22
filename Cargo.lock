@@ -165,9 +165,9 @@ checksum = "32a66949e030da00e8c7d4434b251670a91556f4144941d37452769c25d58a53"
 
 [[package]]
 name = "log"
-version = "0.4.33"
+version = "0.4.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
+checksum = "f9f8bd3e56ce4dfc153cf470fffbfa98c7620958b312ca5c3a4b8d5181fd13c6"
 
 [[package]]
 name = "munzip"
@@ -481,9 +481,9 @@ dependencies = [
 
 [[package]]
 name = "tiny_http_client"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cc44fd279d93886be81d4bce1f02512a3f825174a882a0aa20c74c5085057ca8"
+checksum = "3f6692fd555596b12a8f4a1454d65ce6ffb82737a0c1f2c1a1de3984c4b74650"
 dependencies = [
  "native-tls",
  "rustls",
