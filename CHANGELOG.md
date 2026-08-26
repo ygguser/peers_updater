@@ -31,6 +31,14 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 - `zip` replaced with `munzip`. This slightly reduces the number of dependencies and reduces the size of the executable file.
 
+### Fixed
+- Fixed syntax in Admin API socket address defaults (ygguser/peers_updater#42)
+
+### Contributors
+
+- [@Liniya](https://github.com/Liniya)
+- [@Ygguser](https://github.com/ygguser)
+
 ## [0.3.7] - 2026-08-20
 
 ### Changed
