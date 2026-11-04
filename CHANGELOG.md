@@ -25,7 +25,7 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
-## [0.3.8] - 
+## [0.3.8] - 2026-11-04 
 
 ### Changed
 
@@ -33,6 +33,9 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 
 ### Fixed
 - Fixed syntax in Admin API socket address defaults (ygguser/peers_updater#42)
+
+### Additionally
+- Bump rustls from 0.23.43 to 0.23.46 (ygguser/peers_updater#44)
 
 ### Contributors
 
