@@ -265,7 +265,7 @@ dependencies = [
 
 [[package]]
 name = "peers_updater"
-version = "0.3.7"
+version = "0.3.8"
 dependencies = [
  "clap",
  "munzip",
