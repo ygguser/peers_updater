@@ -39,6 +39,8 @@ In the case of using the Admin API, the connection is established only over plai
 
 [peer_updater](https://github.com/ygguser/peers_updater) automatically selects peers with the fastest response time, but using the options mentioned above you can [accidentally] ignore peers closest to you and thus increase the load on your peer and reduce the quality of the connection.
 
+**Latency** for all protocols except QUIC is the time required to establish a TCP connection, excluding the TLS handshake, WebSocket overhead, and other protocol-specific overhead. For QUIC, it is the time required to establish a connection, including the TLS handshake and the time needed to open a bidirectional stream.
+
 #### Usage Examples
 
 Output of a sorted list of peers:
