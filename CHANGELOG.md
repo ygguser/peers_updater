@@ -25,6 +25,12 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.3.9] - 2026-11-08
+
+### Changed / Fixed
+- Added correct latency calculation for the QUIC protocol (the TLS handshake time is taken into account).  Previously, the value measured during a TCP connection to a peer was used.
+
+
 ## [0.3.8] - 2026-11-04 
 
 ### Changed
