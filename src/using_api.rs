@@ -89,6 +89,7 @@ fn socket_io<T: std::io::Write + std::io::Read>(
     resp: &mut String,
 ) -> std::io::Result<()> {
     conn.write_all(req.as_bytes())?;
+    conn.write_all(b"\n")?;
     conn.read_to_string(resp)?;
 
     Ok(())
