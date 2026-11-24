@@ -129,13 +129,9 @@ impl Peer {
 
         let _ = stream.shutdown(Shutdown::Both);
     }
-        
-    
+
     fn set_quic_latency(&mut self) {
-        let host = self
-            .addr
-            .trim_start_matches('[')
-            .trim_end_matches(']');
+        let host = self.addr.trim_start_matches('[').trim_end_matches(']');
 
         let host_port = match host.parse::<IpAddr>() {
             Ok(IpAddr::V6(_)) => format!("[{}]:{}", host, self.port),
@@ -163,9 +159,7 @@ impl Peer {
 
         let tls_config = rustls::ClientConfig::builder()
             .dangerous()
-            .with_custom_certificate_verifier(Arc::new(NoCertificateVerification {
-                provider,
-            }))
+            .with_custom_certificate_verifier(Arc::new(NoCertificateVerification { provider }))
             .with_no_client_auth();
 
         let quic_tls = match quinn::crypto::rustls::QuicClientConfig::try_from(tls_config) {
@@ -198,8 +192,7 @@ impl Peer {
 
                     let connection = connecting.await.map_err(|e| e.to_string())?;
 
-                    let (_send, _recv) =
-                        connection.open_bi().await.map_err(|e| e.to_string())?;
+                    let (_send, _recv) = connection.open_bi().await.map_err(|e| e.to_string())?;
 
                     let elapsed = start.elapsed();
 

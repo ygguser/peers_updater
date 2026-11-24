@@ -10,8 +10,8 @@ pub fn unpack_archive(tmp_dir: &Path, fname: &str, set_exec: bool) -> io::Result
         .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
 
     for entry in archive {
-        let mut entry = entry
-            .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
+        let mut entry =
+            entry.map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e.to_string()))?;
 
         let filename = entry.filename();
         let path = Path::new(&filename);
@@ -19,7 +19,10 @@ pub fn unpack_archive(tmp_dir: &Path, fname: &str, set_exec: bool) -> io::Result
         // Do not allow absolute paths or ".." components.
         if path.is_absolute()
             || path.components().any(|component| {
-                matches!(component, Component::ParentDir | Component::RootDir | Component::Prefix(_))
+                matches!(
+                    component,
+                    Component::ParentDir | Component::RootDir | Component::Prefix(_)
+                )
             })
         {
             continue;
@@ -45,10 +48,7 @@ pub fn unpack_archive(tmp_dir: &Path, fname: &str, set_exec: bool) -> io::Result
             if set_exec {
                 use std::os::unix::fs::PermissionsExt;
 
-                fs::set_permissions(
-                    &out_path,
-                    fs::Permissions::from_mode(0o755),
-                )?;
+                fs::set_permissions(&out_path, fs::Permissions::from_mode(0o755))?;
             }
         }
     }
