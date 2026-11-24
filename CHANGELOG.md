@@ -25,6 +25,15 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/).
 ### Security
 - in case of vulnerabilities.
 -->
+## [0.4.0] - 2026-11-24
+
+### Fixed
+- Admin API: Fix socket data sending (send newline after JSON) (ygguser/peers_updater#46)
+
+### Contributors
+
+- [@achevsmisle](https://github.com/achevsmisle)
+
 ## [0.3.9] - 2026-11-08
 
 ### Changed / Fixed
